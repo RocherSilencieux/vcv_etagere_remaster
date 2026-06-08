@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "ms-dotnettools.csharp",
+    "ms-dotnettools.csdevkit",
+    "VisualStudioExptTeam.vscodeintellicode",
+    "zhuangtongfa.Material-theme",
+    "redhat.vscode-xml"
+  ]
+}

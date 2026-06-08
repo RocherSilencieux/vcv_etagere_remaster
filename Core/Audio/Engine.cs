@@ -1,0 +1,123 @@
+using System;
+using System.Collections.Generic;
+using NAudio.Wave;
+using vcv_etagere_remaster.Core.Interface;
+
+namespace vcv_etagere_remaster.Core.Audio
+{
+    /// <summary>
+    /// The main Audio Engine using NAudio to process the module graph.
+    /// Implements ISampleProvider to feed audio to NAudio's output devices.
+    /// </summary>
+    public class Engine : IAudioEngine, ISampleProvider
+    {
+        private readonly List<IModule> _modules = new List<IModule>();
+        private readonly List<Cable> _cables = new List<Cable>();
+        
+        // You can change to AsioOut if ASIO is required for ultra low latency
+        private IWavePlayer _waveOut; 
+
+        public WaveFormat WaveFormat { get; }
+
+        public Engine()
+        {
+            // Standard stereo 44.1kHz floating point audio
+            WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100, 2);
+            _waveOut = new WaveOutEvent() { DesiredLatency = 100 }; // 100ms latency for safety without ASIO
+        }
+
+        public void AddModule(IModule module)
+        {
+            lock (_modules)
+            {
+                _modules.Add(module);
+            }
+        }
+
+        public void RemoveModule(IModule module)
+        {
+            lock (_modules)
+            {
+                _modules.Remove(module);
+            }
+        }
+
+        public void AddCable(Cable cable)
+        {
+            lock (_cables)
+            {
+                _cables.Add(cable);
+            }
+        }
+
+        public void RemoveCable(Cable cable)
+        {
+            lock (_cables)
+            {
+                _cables.Remove(cable);
+            }
+        }
+
+        public void Start()
+        {
+            _waveOut.Init(this);
+            _waveOut.Play();
+        }
+
+        public void Stop()
+        {
+            _waveOut.Stop();
+        }
+
+        /// <summary>
+        /// This method is called by NAudio to request the next block of audio.
+        /// </summary>
+        public int Read(float[] buffer, int offset, int count)
+        {
+            // Process per sample frame (left + right = 1 frame for stereo)
+            int channels = WaveFormat.Channels;
+            int frames = count / channels;
+
+            lock (_modules)
+            {
+                for (int n = 0; n < frames; n++)
+                {
+                    // 1. Process all cables (route voltages from outputs to inputs)
+                    foreach (var cable in _cables)
+                    {
+                        cable.Process();
+                    }
+
+                    // 2. Process all modules for this single sample frame
+                    foreach (var module in _modules)
+                    {
+                        module.Process(WaveFormat.SampleRate);
+                    }
+
+                    // 3. Collect master output.
+                    // For now, we assume the first module is outputting to the master bus.
+                    // In a real VCV rack, you'd have an Audio Interface module.
+                    // Here we'll just sum all module outputs simply for testing, or rely on a designated master module later.
+                    
+                    float leftMix = 0f;
+                    float rightMix = 0f;
+
+                    // Temporary testing logic: just sum every module's output if it has an "Output" port.
+                    // Since we don't have concrete ports yet in IModule, we'll output silence.
+                    // TODO: Connect an actual "Audio Interface" module.
+                    
+                    buffer[offset + n * channels] = leftMix;     // Left
+                    buffer[offset + n * channels + 1] = rightMix; // Right
+                }
+            }
+
+            return count; // Always return count, meaning we infinitely generate audio
+        }
+
+        public void Dispose()
+        {
+            Stop();
+            _waveOut?.Dispose();
+        }
+    }
+}

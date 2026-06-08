@@ -1,0 +1,11 @@
+# AI Rules
+
+1. Never use emojis.
+2. Always stay KISS (Keep It Simple, Stupid) - efficient, direct, and straight to the point.
+3. Always verify each piece of information given and never invent anything to please the user.
+4. Always provide the documentation consulted.
+5. Always comment and document code in English.
+6. Always verify that the code builds before declaring a task finished.
+7. Always use a `TODO.md` file in which you write before working and at the end to check if it's finished.
+8. Always add a devlog of modifications and additions in a `DEVLOG.md` file. Never delete anything from it; it must always be fed.
+9. Whenever a feature is developed or modified, a highly detailed markdown file must be created for that feature and any architectural decision. Each file must explain why it's there, what it uses, what uses it, why, and in what way.

@@ -1,12 +1,29 @@
-﻿<Window x:Class="vcv_etagere_remaster.MainWindow"
+<Window x:Class="vcv_etagere_remaster.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:vcv_etagere_remaster"
+        xmlns:viewmodels="clr-namespace:vcv_etagere_remaster.Front.ViewModel.Modules"
+        xmlns:views="clr-namespace:vcv_etagere_remaster.Front.View.Modules"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="VCV Etagere Remaster" Height="800" Width="1200" Background="#121212">
+    
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type viewmodels:VcoViewModel}">
+            <views:VcoView />
+        </DataTemplate>
+    </Window.Resources>
 
+    <Grid>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Modules}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" Margin="20"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </ScrollViewer>
     </Grid>
 </Window>

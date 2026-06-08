@@ -1,9 +1,13 @@
-﻿<Application x:Class="vcv_etagere_remaster.App"
+<Application x:Class="vcv_etagere_remaster.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:vcv_etagere_remaster"
-             StartupUri="MainWindow.xaml">
+             StartupUri="MainWindow.xaml"
+             xmlns:ViewModele="clr-namespace:vcv_etagere_remaster.Front.ViewModel.Base">
+              
     <Application.Resources>
-         
+        <DataTemplate DataType="">
+            
+        </DataTemplate>
     </Application.Resources>
 </Application>

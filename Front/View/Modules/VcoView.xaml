@@ -1,14 +1,52 @@
-﻿<Page x:Class="vcv_etagere_remaster.Front.View.Modules.VcoView"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:vcv_etagere_remaster.Front.View.Modules"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="VcoView">
+<UserControl x:Class="vcv_etagere_remaster.Front.View.Modules.VcoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="150" Background="#2e2e2e" BorderBrush="#1a1a1a" BorderThickness="2">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-    <Grid>
-        
+        <!-- Module Header -->
+        <Border Grid.Row="0" Background="#1a1a1a" CornerRadius="3" Padding="5">
+            <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+        </Border>
+
+        <!-- Controls (Mockup) -->
+        <StackPanel Grid.Row="1" Margin="0,20,0,0">
+            <TextBlock Text="FREQ" Foreground="Gray" HorizontalAlignment="Center" FontSize="10"/>
+            <!-- A placeholder for a sexy knob. We use a slider for now. -->
+            <Slider Minimum="20" Maximum="2000" Value="{Binding BaseFrequency}" Orientation="Horizontal" Margin="0,5,0,20"/>
+        </StackPanel>
+
+        <!-- Input Ports -->
+        <ItemsControl Grid.Row="2" ItemsSource="{Binding InputPorts}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical" Margin="0,5">
+                        <TextBlock Text="{Binding Name}" Foreground="LightGray" FontSize="10" HorizontalAlignment="Center"/>
+                        <Ellipse Width="20" Height="20" Fill="#111" Stroke="Gray" StrokeThickness="2" Margin="0,2"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- Output Ports -->
+        <ItemsControl Grid.Row="3" ItemsSource="{Binding OutputPorts}" Margin="0,10,0,0">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical" Margin="0,5">
+                        <TextBlock Text="{Binding Name}" Foreground="LightGray" FontSize="10" HorizontalAlignment="Center"/>
+                        <Ellipse Width="20" Height="20" Fill="#111" Stroke="White" StrokeThickness="2" Margin="0,2"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
-</Page>
+</UserControl>

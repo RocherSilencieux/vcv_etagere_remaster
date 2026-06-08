@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -13,9 +13,9 @@ namespace vcv_etagere_remaster.Front.ViewModel.Base
     /// </summary>
     public class ViewModelBase : INotifyPropertyChanged
     {
-        // All models will implement that to notify (UI<->Code) the view when a property changes
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged([CallerMemberName] string name = null)
+        // All models will implement that to notify (UI<>Code) the view when a property changes
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void NotifyPropertyChanged([CallerMemberName] string? name = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
