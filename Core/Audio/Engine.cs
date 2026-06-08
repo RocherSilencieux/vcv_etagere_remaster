@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using NAudio.Wave;
 using vcv_etagere_remaster.Core.Interface;
+using vcv_etagere_remaster.Core.Modules;
 
 namespace vcv_etagere_remaster.Core.Audio
 {
@@ -16,6 +17,8 @@ namespace vcv_etagere_remaster.Core.Audio
         
         // You can change to AsioOut if ASIO is required for ultra low latency
         private IWavePlayer _waveOut; 
+        private int _currentDeviceNumber = -1;
+        private bool _isPlaying = false;
 
         public WaveFormat WaveFormat { get; }
 
@@ -23,7 +26,7 @@ namespace vcv_etagere_remaster.Core.Audio
         {
             // Standard stereo 44.1kHz floating point audio
             WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100, 2);
-            _waveOut = new WaveOutEvent() { DesiredLatency = 100 }; // 100ms latency for safety without ASIO
+            _waveOut = new WaveOutEvent() { DeviceNumber = _currentDeviceNumber, DesiredLatency = 100 }; // 100ms latency for safety without ASIO
         }
 
         public void AddModule(IModule module)
@@ -31,6 +34,14 @@ namespace vcv_etagere_remaster.Core.Audio
             lock (_modules)
             {
                 _modules.Add(module);
+                if (module is AudioOutputModule audioOut)
+                {
+                    audioOut.DeviceChanged += OnAudioOutputDeviceChanged;
+                    if (audioOut.SelectedDeviceNumber != _currentDeviceNumber)
+                    {
+                        ChangeDevice(audioOut.SelectedDeviceNumber);
+                    }
+                }
             }
         }
 
@@ -39,6 +50,62 @@ namespace vcv_etagere_remaster.Core.Audio
             lock (_modules)
             {
                 _modules.Remove(module);
+                if (module is AudioOutputModule audioOut)
+                {
+                    audioOut.DeviceChanged -= OnAudioOutputDeviceChanged;
+                }
+            }
+        }
+
+        private void OnAudioOutputDeviceChanged(object? sender, int deviceNumber)
+        {
+            ChangeDevice(deviceNumber);
+        }
+
+        public void ChangeDevice(int deviceNumber)
+        {
+            lock (_modules)
+            {
+                if (_currentDeviceNumber == deviceNumber)
+                    return;
+
+                _currentDeviceNumber = deviceNumber;
+
+                if (_isPlaying)
+                {
+                    try
+                    {
+                        _waveOut.Stop();
+                    }
+                    catch { }
+
+                    _waveOut.Dispose();
+
+                    _waveOut = new WaveOutEvent()
+                    {
+                        DeviceNumber = _currentDeviceNumber,
+                        DesiredLatency = 100
+                    };
+
+                    try
+                    {
+                        _waveOut.Init(this);
+                        _waveOut.Play();
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Error starting WaveOut with device {deviceNumber}: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    _waveOut.Dispose();
+                    _waveOut = new WaveOutEvent()
+                    {
+                        DeviceNumber = _currentDeviceNumber,
+                        DesiredLatency = 100
+                    };
+                }
             }
         }
 
@@ -60,14 +127,47 @@ namespace vcv_etagere_remaster.Core.Audio
 
         public void Start()
         {
-            _waveOut.Init(this);
-            _waveOut.Play();
+            lock (_modules)
+            {
+                if (_isPlaying) return;
+
+                try
+                {
+                    _waveOut.Dispose();
+                    _waveOut = new WaveOutEvent()
+                    {
+                        DeviceNumber = _currentDeviceNumber,
+                        DesiredLatency = 100
+                    };
+                    _waveOut.Init(this);
+                    _waveOut.Play();
+                    _isPlaying = true;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Failed to start audio engine: {ex.Message}");
+                }
+            }
         }
 
         public void Stop()
         {
-            _waveOut.Stop();
+            lock (_modules)
+            {
+                if (!_isPlaying) return;
+
+                try
+                {
+                    _waveOut.Stop();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Failed to stop waveOut: {ex.Message}");
+                }
+                _isPlaying = false;
+            }
         }
+
 
         /// <summary>
         /// This method is called by NAudio to request the next block of audio.

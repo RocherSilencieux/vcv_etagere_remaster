@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="150"
-             Width="160" Height="320" Margin="10"
+             Width="160" Height="360" Margin="10"
              Background="#2e2e2e" BorderBrush="#1a1a1a" BorderThickness="2">
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -21,10 +21,10 @@
         </Border>
 
         <!-- Master Volume Control -->
-        <StackPanel Grid.Row="1" Margin="0,20,0,0">
+        <StackPanel Grid.Row="1" Margin="0,15,0,0">
             <TextBlock Text="MASTER VOL" Foreground="Gray" HorizontalAlignment="Center" FontSize="10"/>
             <!-- Slider for Master Volume from 0.0 to 1.0 -->
-            <Slider Minimum="0.0" Maximum="1.0" Value="{Binding MasterVolume}" Orientation="Vertical" Height="100" HorizontalAlignment="Center" Margin="0,5,0,20"/>
+            <Slider Minimum="0.0" Maximum="1.0" Value="{Binding MasterVolume}" Orientation="Vertical" Height="90" HorizontalAlignment="Center" Margin="0,5,0,15"/>
         </StackPanel>
 
         <!-- Audio Inputs -->
@@ -36,12 +36,32 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Vertical" Margin="5,5">
+                    <StackPanel Orientation="Vertical" Margin="5,2">
                         <TextBlock Text="{Binding Name}" Foreground="LightGray" FontSize="10" HorizontalAlignment="Center"/>
                         <Ellipse Width="25" Height="25" Fill="#111" Stroke="#ff4444" StrokeThickness="2" Margin="0,2"/>
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+
+        <!-- Audio Device Selection -->
+        <StackPanel Grid.Row="3" Margin="0,10,0,0">
+            <TextBlock Text="DEVICE" Foreground="Gray" HorizontalAlignment="Center" FontSize="10" Margin="0,0,0,3"/>
+            <ComboBox ItemsSource="{Binding AvailableDevices}"
+                      SelectedItem="{Binding SelectedDevice}"
+                      DisplayMemberPath="Name"
+                      Background="#1a1a1a"
+                      Foreground="White"
+                      BorderBrush="#444"
+                      FontSize="10"
+                      HorizontalContentAlignment="Stretch">
+                <ComboBox.ItemContainerStyle>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Foreground" Value="Black"/>
+                    </Style>
+                </ComboBox.ItemContainerStyle>
+            </ComboBox>
+        </StackPanel>
     </Grid>
 </UserControl>
+

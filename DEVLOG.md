@@ -35,3 +35,26 @@
 - Created `AudioOutputViewModel` and `AudioOutputView.xaml` with a Master Volume slider.
 - Updated `MainViewModel` to hard-patch the VCO to the Audio Output module via `Cable` objects for testing.
 - Generated `Docs/Features/05_AudioOutputModule.md` to document the new architecture.
+- Implemented Windows audio output device query logic in `AudioOutputModule` utilizing NAudio `WaveOut.DeviceCount` and `WaveOut.GetCapabilities`.
+- Added a `DeviceChanged` event to `AudioOutputModule` to notify the engine when the user changes selection.
+- Updated `Engine.cs` to listen to the `DeviceChanged` event and dynamically recreate `WaveOutEvent` with the selected device ID.
+- Added `AvailableDevices` list and `SelectedDevice` property bindings in `AudioOutputViewModel`.
+- Implemented a `DEVICE` ComboBox in `AudioOutputView.xaml` and increased views' height to `360` to accommodate the selection dropdown.
+- Fixed the `CS8618` compiler warning by initializing the `_audioOutputModel` field with `null!` to satisfy the WPF markup compilation analyzer.
+- Generated `Docs/Features/06_AudioDeviceSelection.md` to document the audio device selection architecture.
+- Added `ComboBox.ItemContainerStyle` to `AudioOutputView.xaml` to set the text color of the dropdown choices (`ComboBoxItem`) to `Black`, improving contrast and readability against the system default light background of the dropdown popup.
+- Implemented `ReverbModule` DSP block using a Schroeder Reverb architecture (4 parallel comb filters and 2 series all-pass filters per channel).
+- Configured a stereo spread layout by offsetting the right channel's delay line buffer lengths by 23 samples to create phase width.
+- Created `ReverbViewModel` to bind Room Size, Damping, Mix, and Active/Bypass toggles.
+- Created `ReverbView.xaml` layout themed with a deep-violet style header (`#2e113d`) and matching height/width dimensions (`360`x`160`).
+- Registered `ReverbViewModel` to `ReverbView` DataTemplate mappings in `MainWindow.xaml`.
+- Updated `MainViewModel` to instantiate and patch the Reverb module directly into the core audio loop: `VcoModule` -> `ReverbModule` -> `AudioOutputModule`.
+- Created `Docs/Features/07_ReverbModule.md` detailing the mathematical formulas and implementation structure.
+- Implemented `DelayModule` DSP block utilizing a fractional `DelayLine` with linear interpolation to eliminate parameter adjustment click noise.
+- Created three delay modes: Simple Stereo, Ping-Pong (crossed feedback), and Mono.
+- Created `DelayViewModel` mapping time, feedback, mix, bypass, and enum presets.
+- Designed `DelayView.xaml` layout themed with a dark-teal header (`#0d2830`) and matching height/width dimensions (`360`x`160`).
+- Styled the preset selection dropdown items in `DelayView.xaml` with black text for readability.
+- Registered `DelayViewModel` to `DelayView` DataTemplate mappings in `MainWindow.xaml`.
+- Patched the signal chain in `MainViewModel`: `VcoModule` -> `DelayModule` -> `ReverbModule` -> `AudioOutputModule`.
+- Created `Docs/Features/08_DelayModule.md` outlining the interpolation math, delay structures, and MVVM routing.

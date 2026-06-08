@@ -13,6 +13,9 @@
 - [x] Generate massive detailed markdown documentation for all current architectural decisions and features.
 - [x] Implement `LinearRamp` utility to smooth parameter transitions and prevent audio pops.
 - [x] Create `AudioOutputModule` and decouple NAudio hardware buffer from individual synth modules.
+- [x] Implement PC audio output device selection on the Audio Output module.
+- [x] Implement a parameterizable Reverb module (Schroeder/Freeverb model) with a bypass switch.
+- [x] Implement a parameterizable Delay module with presets (Simple, Ping-Pong, Mono) and a bypass switch.
 - [ ] Implement robust Drag-and-Drop functionality for cables.
 - [ ] Add more complex modules (VCA, ADSR, Filter).
 - [ ] Refine the visual design of `VcoView.xaml` with custom controls (knobs, styled jacks).

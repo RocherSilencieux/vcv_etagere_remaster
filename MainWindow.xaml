@@ -13,6 +13,12 @@
         <DataTemplate DataType="{x:Type viewmodels:VcoViewModel}">
             <views:VcoView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:ReverbViewModel}">
+            <views:ReverbView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:DelayViewModel}">
+            <views:DelayView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type viewmodels:AudioOutputViewModel}">
             <views:AudioOutputView />
         </DataTemplate>
