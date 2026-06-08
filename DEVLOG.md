@@ -22,3 +22,10 @@
 - Added Rule 9 to `.cursorrules`: Mandating ultra-detailed Markdown documentation for every feature and architectural decision.
 - Generated comprehensive architectural documentation in `Docs/Architecture/` (`01_MVVM_Pattern.md`, `02_NAudio_Engine.md`, `03_Abstract_Interfaces.md`).
 - Generated comprehensive feature documentation in `Docs/Features/` (`01_VcoModule.md`, `02_Cable_Patching.md`, `03_UI_Rendering.md`).
+
+## 2026-06-08
+- Fixed `VcoViewModel.cs` property binding so the slider correctly alters the `BaseFrequency` property.
+- Routed the `VcoModule` audio output to the master bus inside `Engine.cs` (attenuated to 0.1f volume).
+- Integrated `LinearRamp` utility class to handle parameter smoothing.
+- Applied `LinearRamp` to `VcoModule.BaseFrequency` to prevent audio pops and zipper noise when interacting with the UI slider.
+- Added `Docs/Features/04_LinearRamp.md` to document the architectural utility of the parameter smoother in accordance with Rule 9.

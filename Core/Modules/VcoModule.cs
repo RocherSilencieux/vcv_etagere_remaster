@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using vcv_etagere_remaster.Core.Interface;
+using vcv_etagere_remaster.Core.Utils;
 
 namespace vcv_etagere_remaster.Core.Modules
 {
@@ -32,24 +33,35 @@ namespace vcv_etagere_remaster.Core.Modules
         public IPort AudioOutput { get; }
 
         private double _phase = 0;
-        private double _baseFrequency = 440.0; // A4
+        private readonly LinearRamp _baseFrequencyRamp;
 
         public VcoModule()
         {
             FrequencyInput = new SimplePort(Guid.NewGuid().ToString(), "1V/Oct", PortType.Input);
             AudioOutput = new SimplePort(Guid.NewGuid().ToString(), "Sine Out", PortType.Output);
+            
+            // 50ms ramp time at 44100Hz to smooth out slider movements
+            _baseFrequencyRamp = new LinearRamp(44100, 0.05, 440.0);
+        }
+
+        public double BaseFrequency
+        {
+            get => _baseFrequencyRamp.Target;
+            set => _baseFrequencyRamp.Target = value;
         }
 
         public void SetBaseFrequency(double frequency)
         {
-            _baseFrequency = frequency;
+            _baseFrequencyRamp.Target = frequency;
         }
 
         public void Process(float sampleRate)
         {
-            // 1V/Octave calculation (simplified)
-            // If Input is 1.0V, frequency doubles. If 0.0V, it's base frequency.
-            double currentFrequency = _baseFrequency * Math.Pow(2.0, FrequencyInput.Value);
+            // Get the smoothed base frequency for this specific sample frame
+            double currentBaseFreq = _baseFrequencyRamp.Next();
+
+            // 1V/Octave calculation
+            double currentFrequency = currentBaseFreq * Math.Pow(2.0, FrequencyInput.Value);
 
             // Calculate sine wave phase increment
             double phaseIncrement = (currentFrequency * 2.0 * Math.PI) / sampleRate;

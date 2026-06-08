@@ -11,11 +11,14 @@ namespace vcv_etagere_remaster.Front.ViewModel.Modules
 
         public double BaseFrequency
         {
-            get => _vcoModel != null ? 440.0 : 0; // Simplified
+            get => _vcoModel != null ? _vcoModel.BaseFrequency : 0;
             set
             {
-                _vcoModel?.SetBaseFrequency(value);
-                NotifyPropertyChanged();
+                if (_vcoModel != null)
+                {
+                    _vcoModel.BaseFrequency = value;
+                    NotifyPropertyChanged();
+                }
             }
         }
 
