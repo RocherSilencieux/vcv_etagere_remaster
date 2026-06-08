@@ -13,14 +13,17 @@
         <DataTemplate DataType="{x:Type viewmodels:VcoViewModel}">
             <views:VcoView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:AudioOutputViewModel}">
+            <views:AudioOutputView />
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Modules}">
+            <ItemsControl ItemsSource="{Binding Modules}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,50,0,0">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" Margin="20"/>
+                        <WrapPanel Orientation="Horizontal" Margin="20" HorizontalAlignment="Center" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>

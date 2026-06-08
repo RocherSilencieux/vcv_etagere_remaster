@@ -102,15 +102,13 @@ namespace vcv_etagere_remaster.Core.Audio
                     float leftMix = 0f;
                     float rightMix = 0f;
 
-                    // Temporary testing logic: just sum every module's output if it has an "Output" port.
-                    // TODO: Connect an actual "Audio Interface" module later.
+                    // Read from the dedicated Audio Output Module
                     foreach (var module in _modules)
                     {
-                        if (module is vcv_etagere_remaster.Core.Modules.VcoModule vco)
+                        if (module is vcv_etagere_remaster.Core.Modules.AudioOutputModule audioOut)
                         {
-                            // Attenuate by 0.1f to prevent clipping (digital distortion)
-                            leftMix += vco.AudioOutput.Value * 0.1f; 
-                            rightMix += vco.AudioOutput.Value * 0.1f;
+                            leftMix += audioOut.LeftInput.Value;
+                            rightMix += audioOut.RightInput.Value;
                         }
                     }
                     

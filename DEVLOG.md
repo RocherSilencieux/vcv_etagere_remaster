@@ -29,3 +29,9 @@
 - Integrated `LinearRamp` utility class to handle parameter smoothing.
 - Applied `LinearRamp` to `VcoModule.BaseFrequency` to prevent audio pops and zipper noise when interacting with the UI slider.
 - Added `Docs/Features/04_LinearRamp.md` to document the architectural utility of the parameter smoother in accordance with Rule 9.
+- Created `audio_output` branch.
+- Created `AudioOutputModule` to serve as the exclusive gateway to the NAudio hardware buffer.
+- Removed hardcoded VCO audio routing from `Engine.cs` and replaced it with dynamic `AudioOutputModule` detection.
+- Created `AudioOutputViewModel` and `AudioOutputView.xaml` with a Master Volume slider.
+- Updated `MainViewModel` to hard-patch the VCO to the Audio Output module via `Cable` objects for testing.
+- Generated `Docs/Features/05_AudioOutputModule.md` to document the new architecture.

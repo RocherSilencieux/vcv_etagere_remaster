@@ -21,10 +21,20 @@ namespace vcv_etagere_remaster.Front.ViewModel
             // Create a test VCO Module
             var vcoModel = new VcoModule();
             _engine.AddModule(vcoModel);
-
-            // Create ViewModel wrapper and expose it to the View
             var vcoViewModel = new VcoViewModel(vcoModel);
             Modules.Add(vcoViewModel);
+
+            // Create Audio Output Module
+            var audioOutModel = new AudioOutputModule();
+            _engine.AddModule(audioOutModel);
+            var audioOutViewModel = new AudioOutputViewModel(audioOutModel);
+            Modules.Add(audioOutViewModel);
+
+            // Wire them together
+            var cableLeft = new Cable(vcoModel.AudioOutput, audioOutModel.LeftInput);
+            var cableRight = new Cable(vcoModel.AudioOutput, audioOutModel.RightInput);
+            _engine.AddCable(cableLeft);
+            _engine.AddCable(cableRight);
         }
 
         public void Shutdown()
