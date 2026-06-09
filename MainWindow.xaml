@@ -27,7 +27,7 @@
         </DataTemplate>
     </Window.Resources>
 
-    <Grid>
+    <Grid x:Name="MainGrid">
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
                       Background="#0e0e0e">
             <!-- Canvas principal — grille pointillée + modules librement positionnés -->
@@ -87,6 +87,7 @@
                 <!-- ItemsControl des modules — panel Canvas, positions liées à GridX/GridY -->
                 <ItemsControl x:Name="ModulesControl" ItemsSource="{Binding Modules}"
                               Canvas.Left="0" Canvas.Top="0">
+                <ItemsControl ItemsSource="{Binding Modules}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,50,0,0">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas/>
@@ -101,6 +102,7 @@
                 </ItemsControl>
             </Canvas>
         </ScrollViewer>
+        <Canvas x:Name="CableLayer" IsHitTestVisible="True" />
     </Grid>
 </Window>
 
