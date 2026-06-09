@@ -31,5 +31,22 @@ namespace vcv_etagere_remaster.Core.Audio
         {
             Destination.Value = Source.Value;
         }
+
+        public void AddCable(Engine engine)
+        {
+            engine?.AddCable(this);
+        }
+
+
+        public void RemoveCable(Engine engine)
+        {
+            engine?.RemoveCable(this);
+        }
+        public static void Stop(Engine engine)
+        {
+            if (engine == null) return;
+            try { engine.Stop(); } catch { }
+            try { engine.Dispose(); } catch { }
+        }
     }
 }

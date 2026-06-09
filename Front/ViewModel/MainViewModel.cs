@@ -9,9 +9,7 @@ namespace vcv_etagere_remaster.Front.ViewModel
     public class MainViewModel : ViewModelBase
     {
         private readonly Engine _engine;
-
-        // Expose engine so the UI can call engine-level operations (cable management, stop, dispose)
-        public Engine Engine => _engine;
+        public Engine Engine => _engine; // Expose Engine instance so callers can use Cable methods directly
 
         public ObservableCollection<ModuleViewModuleBase> Modules { get; } = new ObservableCollection<ModuleViewModuleBase>();
 
@@ -40,6 +38,7 @@ namespace vcv_etagere_remaster.Front.ViewModel
             //_engine.AddCable(cableRight);
         }
 
-        // NOTE: Cable management and engine lifecycle are handled by Engine directly.
+        // Expose engine cable management for the UI so created cables are registered with the audio engine
+        
     }
 }

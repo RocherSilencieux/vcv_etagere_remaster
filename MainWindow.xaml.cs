@@ -16,6 +16,7 @@ namespace vcv_etagere_remaster
     public partial class MainWindow : Window
     {
         private MainViewModel _viewModel;
+        private Engine _engine;
         private PortViewModelBase selectedPortVM = null;
         private FrameworkElement selectedPortVisual = null;
         public Path tempCable = null;
@@ -26,6 +27,7 @@ namespace vcv_etagere_remaster
         {
             InitializeComponent();
             _viewModel = new MainViewModel();
+            _engine = _viewModel.Engine;
             this.DataContext = _viewModel;
             this.Closed += MainWindow_Closed;
 
@@ -37,14 +39,10 @@ namespace vcv_etagere_remaster
         private void MainWindow_Closed(object? sender, EventArgs e)
         {
             // Stop and dispose the engine via exposed Engine property
+            // Use Cable helper to stop and dispose the engine
             try
             {
-                _viewModel.Engine.Stop();
-            }
-            catch { }
-            try
-            {
-                _viewModel.Engine.Dispose();
+                Cable.Stop(_engine);
             }
             catch { }
         }
@@ -152,7 +150,7 @@ namespace vcv_etagere_remaster
                         Cable newCable = new Cable(outPortModel, inPortModel); //create the cable preset
                         allCables.Add(newCable);
                         CableLayer.Children.Add(path);
-                        _viewModel.Engine.AddCable(newCable); // Register the cable with the audio engine so it will be processed
+                        newCable.AddCable(_engine); // Register the cable with the audio engine so it will be processed
                         path.MouseRightButtonDown += (s, args) => { RemoveCable(newCable, path); }; //right click = remove cable
 
                     }
@@ -193,7 +191,7 @@ namespace vcv_etagere_remaster
             allCables.Remove(cable);
 
             // Unregister from audio engine
-            _viewModel.Engine.RemoveCable(cable);
+            cable.RemoveCable(_engine);
         }
         //==============================
         //EXTRACT FROM VIEWMODEL TO INTERNAL

@@ -42,21 +42,16 @@ namespace vcv_etagere_remaster.Core.Audio
             }
         }
 
-        public void AddCable(Core.Audio.Cable cable)
+        public void AddCable(Cable cable)
         {
-            if (cable == null) return;
             lock (_cables)
             {
-                if (!_cables.Contains(cable))
-                {
-                    _cables.Add(cable);
-                }
+                _cables.Add(cable);
             }
         }
 
-        public void RemoveCable(Core.Audio.Cable cable)
+        public void RemoveCable(Cable cable)
         {
-            if (cable == null) return;
             lock (_cables)
             {
                 _cables.Remove(cable);
@@ -71,15 +66,7 @@ namespace vcv_etagere_remaster.Core.Audio
 
         public void Stop()
         {
-            // Stop audio playback but do not dispose resources here; Dispose() will handle cleanup.
-            try
-            {
-                _waveOut?.Stop();
-            }
-            catch (Exception)
-            {
-                // Swallow exceptions from stop to avoid crashing audio thread callers
-            }
+            _waveOut.Stop();
         }
 
         /// <summary>
@@ -135,13 +122,7 @@ namespace vcv_etagere_remaster.Core.Audio
 
         public void Dispose()
         {
-            // Ensure playback is stopped and release audio device resources
-            try
-            {
-                Stop();
-            }
-            catch { }
-
+            Stop();
             _waveOut?.Dispose();
         }
     }
