@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Input;
 using vcv_etagere_remaster.Core.Modules;
 using vcv_etagere_remaster.Front.ViewModel.Base;
 
@@ -76,6 +77,8 @@ namespace vcv_etagere_remaster.Front.ViewModel.Modules
             set => IsBypassed = !value;
         }
 
+        public ICommand ToggleActiveCommand { get; }
+
         public IEnumerable<DelayModeDescription> AvailablePresets { get; } = new[]
         {
             new DelayModeDescription { Mode = DelayMode.Simple, Name = "Simple (Stéréo)" },
@@ -110,6 +113,8 @@ namespace vcv_etagere_remaster.Front.ViewModel.Modules
             OutputPorts.Add(new PortViewModelBase(_delayModel.LeftOutput));
             OutputPorts.Add(new PortViewModelBase(_delayModel.RightOutput));
 
+            ToggleActiveCommand = new RelayCommand(_ => IsActive = !IsActive);
+
             if (_delayModel != null)
             {
                 _selectedPreset = AvailablePresets.FirstOrDefault(p => p.Mode == _delayModel.Mode)
@@ -118,3 +123,4 @@ namespace vcv_etagere_remaster.Front.ViewModel.Modules
         }
     }
 }
+

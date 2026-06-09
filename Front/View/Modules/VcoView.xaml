@@ -5,50 +5,112 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="150"
-             Width="160" Height="360" Margin="10"
+             Width="160" Height="360"
              Background="#2e2e2e" BorderBrush="#1a1a1a" BorderThickness="2">
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
 
-        <!-- Module Header -->
-        <Border Grid.Row="0" Background="#1a1a1a" CornerRadius="3" Padding="5">
-            <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
-        </Border>
+    <!-- Grille racine : contenu du module + overlay du bouton ✕ -->
+    <Grid>
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- Controls (Mockup) -->
-        <StackPanel Grid.Row="1" Margin="0,20,0,0">
-            <TextBlock Text="FREQ" Foreground="Gray" HorizontalAlignment="Center" FontSize="10"/>
-            <!-- A placeholder for a sexy knob. We use a slider for now. -->
-            <Slider Minimum="20" Maximum="2000" Value="{Binding BaseFrequency}" Orientation="Horizontal" Margin="0,5,0,20"/>
-        </StackPanel>
+            <!-- Module Header — Tag DragHandle pour le drag & drop -->
+            <Border Grid.Row="0" Background="#1a1a1a" CornerRadius="3" Padding="5,5,28,5"
+                    Tag="DragHandle" Cursor="SizeAll">
+                <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="Bold"
+                           HorizontalAlignment="Center" IsHitTestVisible="False"/>
+            </Border>
 
-        <!-- Input Ports -->
-        <ItemsControl Grid.Row="2" ItemsSource="{Binding InputPorts}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Vertical" Margin="0,5">
-                        <TextBlock Text="{Binding Name}" Foreground="LightGray" FontSize="10" HorizontalAlignment="Center"/>
-                        <Ellipse Width="20" Height="20" Fill="#111" Stroke="Gray" StrokeThickness="2" Margin="0,2"/>
-                    </StackPanel>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+            <!-- Controls -->
+            <StackPanel Grid.Row="1" Margin="0,20,0,0">
+                <TextBlock Text="FREQ" Foreground="Gray" HorizontalAlignment="Center" FontSize="10"/>
+                <Slider Minimum="20" Maximum="2000" Value="{Binding BaseFrequency}"
+                        Orientation="Horizontal" Margin="0,5,0,20"/>
 
-        <!-- Output Ports -->
-        <ItemsControl Grid.Row="3" ItemsSource="{Binding OutputPorts}" Margin="0,10,0,0">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Vertical" Margin="0,5">
-                        <TextBlock Text="{Binding Name}" Foreground="LightGray" FontSize="10" HorizontalAlignment="Center"/>
-                        <Ellipse Width="20" Height="20" Fill="#111" Stroke="White" StrokeThickness="2" Margin="0,2"/>
-                    </StackPanel>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+                <!-- Bouton ON/OFF manuel (Bypass) -->
+                <Button Command="{Binding ToggleActiveCommand}"
+                        HorizontalAlignment="Center" Width="80" Height="28" Cursor="Hand"
+                        Margin="0,4,0,0" ToolTip="Activer/Désactiver le VCO">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="PowerBd" CornerRadius="5" Background="#1a3d1a"
+                                                BorderBrush="#47ff47" BorderThickness="1.5">
+                                            <TextBlock x:Name="PowerTxt" Text="Power"
+                                                       Foreground="#47ff47" FontWeight="Bold" FontSize="11"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                <Setter TargetName="PowerBd" Property="Background" Value="#3d1a1a"/>
+                                                <Setter TargetName="PowerBd" Property="BorderBrush" Value="#ff4747"/>
+                                                <Setter TargetName="PowerTxt" Property="Foreground" Value="#ff4747"/>
+                                                <Setter TargetName="PowerTxt" Property="Text" Value="Bypass"/>
+                                            </DataTrigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="PowerBd" Property="BorderBrush" Value="White"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </StackPanel>
+
+            <!-- Input Ports -->
+            <ItemsControl Grid.Row="2" ItemsSource="{Binding InputPorts}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical" Margin="0,5">
+                            <TextBlock Text="{Binding Name}" Foreground="LightGray" FontSize="10" HorizontalAlignment="Center"/>
+                            <Ellipse Width="20" Height="20" Fill="#111" Stroke="Gray" StrokeThickness="2" Margin="0,2"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Output Ports -->
+            <ItemsControl Grid.Row="3" ItemsSource="{Binding OutputPorts}" Margin="0,10,0,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical" Margin="0,5">
+                            <TextBlock Text="{Binding Name}" Foreground="LightGray" FontSize="10" HorizontalAlignment="Center"/>
+                            <Ellipse Width="20" Height="20" Fill="#111" Stroke="White" StrokeThickness="2" Margin="0,2"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+
+        <!-- Bouton ✕ suppression — overlay haut droite -->
+        <Button Command="{Binding RemoveCommand}"
+                HorizontalAlignment="Right" VerticalAlignment="Top"
+                Width="22" Height="22" Margin="0,6,6,0"
+                Cursor="Hand" ToolTip="Supprimer le module"
+                Panel.ZIndex="10">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="#aa2222" CornerRadius="11"
+                            Width="22" Height="22">
+                        <TextBlock Text="✕" Foreground="White" FontSize="11" FontWeight="Bold"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#ff3333"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
     </Grid>
 </UserControl>
+

@@ -34,6 +34,13 @@ namespace vcv_etagere_remaster.Core.Modules
 
         private double _phase = 0;
         private readonly LinearRamp _baseFrequencyRamp;
+        private bool _isBypassed = false;
+
+        public bool IsBypassed
+        {
+            get => _isBypassed;
+            set => _isBypassed = value;
+        }
 
         public VcoModule()
         {
@@ -72,8 +79,8 @@ namespace vcv_etagere_remaster.Core.Modules
                 _phase -= 2.0 * Math.PI;
             }
 
-            // Output the sine value
-            AudioOutput.Value = (float)Math.Sin(_phase);
+            // Output the sine value (muted if bypassed)
+            AudioOutput.Value = _isBypassed ? 0f : (float)Math.Sin(_phase);
         }
     }
 }

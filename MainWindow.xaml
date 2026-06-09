@@ -8,7 +8,7 @@
         xmlns:views="clr-namespace:vcv_etagere_remaster.Front.View.Modules"
         mc:Ignorable="d"
         Title="VCV Etagere Remaster" Height="800" Width="1200" Background="#121212">
-    
+
     <Window.Resources>
         <DataTemplate DataType="{x:Type viewmodels:VcoViewModel}">
             <views:VcoView />
@@ -22,17 +22,85 @@
         <DataTemplate DataType="{x:Type viewmodels:AudioOutputViewModel}">
             <views:AudioOutputView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:AdsrViewModel}">
+            <views:AdsrView />
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Modules}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,50,0,0">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" Margin="20" HorizontalAlignment="Center" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                      Background="#0e0e0e">
+            <!-- Canvas principal — grille pointillée + modules librement positionnés -->
+            <Canvas x:Name="ModuleCanvas" Width="3000" Height="2000"
+                    MouseRightButtonDown="Canvas_MouseRightButtonDown"
+                    PreviewMouseLeftButtonDown="Canvas_PreviewMouseLeftButtonDown"
+                    PreviewMouseMove="Canvas_PreviewMouseMove"
+                    PreviewMouseLeftButtonUp="Canvas_PreviewMouseLeftButtonUp">
+
+                <!-- Fond : grille de points espacés de 20px -->
+                <Canvas.Background>
+                    <DrawingBrush TileMode="Tile"
+                                  Viewport="0,0,20,20"
+                                  ViewportUnits="Absolute"
+                                  Stretch="None">
+                        <DrawingBrush.Drawing>
+                            <DrawingGroup>
+                                <GeometryDrawing Brush="#161616">
+                                    <GeometryDrawing.Geometry>
+                                        <RectangleGeometry Rect="0,0,20,20"/>
+                                    </GeometryDrawing.Geometry>
+                                </GeometryDrawing>
+                                <GeometryDrawing Brush="#3a3a3a">
+                                    <GeometryDrawing.Geometry>
+                                        <EllipseGeometry Center="1,1" RadiusX="1" RadiusY="1"/>
+                                    </GeometryDrawing.Geometry>
+                                </GeometryDrawing>
+                            </DrawingGroup>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </Canvas.Background>
+
+                <!-- Menu contextuel clic droit : ajouter un module -->
+                <Canvas.ContextMenu>
+                    <ContextMenu Background="#1e1e1e" BorderBrush="#444" BorderThickness="1">
+                        <MenuItem Header="＋  Ajouter un module" IsEnabled="False"
+                                  FontWeight="Bold" Foreground="#666" FontSize="11"/>
+                        <Separator/>
+                        <MenuItem Header="🎵  VCO — Oscillateur"
+                                  Tag="VCO" Click="AddModuleMenuItem_Click"
+                                  Foreground="White" Background="#1e1e1e"/>
+                        <MenuItem Header="🔁  Delay"
+                                  Tag="Delay" Click="AddModuleMenuItem_Click"
+                                  Foreground="White" Background="#1e1e1e"/>
+                        <MenuItem Header="🌊  Reverb"
+                                  Tag="Reverb" Click="AddModuleMenuItem_Click"
+                                  Foreground="White" Background="#1e1e1e"/>
+                        <MenuItem Header="🔊  Sortie Audio"
+                                  Tag="AudioOutput" Click="AddModuleMenuItem_Click"
+                                  Foreground="White" Background="#1e1e1e"/>
+                        <MenuItem Header="⚡  ADSR — Enveloppe"
+                                  Tag="ADSR" Click="AddModuleMenuItem_Click"
+                                  Foreground="White" Background="#1e1e1e"/>
+                    </ContextMenu>
+                </Canvas.ContextMenu>
+
+                <!-- ItemsControl des modules — panel Canvas, positions liées à GridX/GridY -->
+                <ItemsControl x:Name="ModulesControl" ItemsSource="{Binding Modules}"
+                              Canvas.Left="0" Canvas.Top="0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Canvas.Left" Value="{Binding GridX}"/>
+                            <Setter Property="Canvas.Top"  Value="{Binding GridY}"/>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                </ItemsControl>
+            </Canvas>
         </ScrollViewer>
     </Grid>
 </Window>
+

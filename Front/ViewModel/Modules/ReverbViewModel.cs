@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 using vcv_etagere_remaster.Core.Modules;
 using vcv_etagere_remaster.Front.ViewModel.Base;
 
@@ -67,6 +68,8 @@ namespace vcv_etagere_remaster.Front.ViewModel.Modules
             set => IsBypassed = !value;
         }
 
+        public ICommand ToggleActiveCommand { get; }
+
         public ReverbViewModel(ReverbModule model) : base(model)
         {
             _reverbModel = model;
@@ -75,6 +78,9 @@ namespace vcv_etagere_remaster.Front.ViewModel.Modules
             InputPorts.Add(new PortViewModelBase(_reverbModel.RightInput));
             OutputPorts.Add(new PortViewModelBase(_reverbModel.LeftOutput));
             OutputPorts.Add(new PortViewModelBase(_reverbModel.RightOutput));
+
+            ToggleActiveCommand = new RelayCommand(_ => IsActive = !IsActive);
         }
     }
 }
+
