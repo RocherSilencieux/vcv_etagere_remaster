@@ -9,6 +9,7 @@ namespace vcv_etagere_remaster.Front.ViewModel
     public class MainViewModel : ViewModelBase
     {
         private readonly Engine _engine;
+        public Engine Engine => _engine; // Expose Engine instance so callers can use Cable methods directly
         private const double GridSize = 20.0;
 
         public ObservableCollection<ModuleViewModuleBase> Modules { get; } = new ObservableCollection<ModuleViewModuleBase>();
@@ -122,13 +123,15 @@ namespace vcv_etagere_remaster.Front.ViewModel
         public void RemoveModule(ModuleViewModuleBase vm)
         {
             Modules.Remove(vm);
+            // Wire them together
+            //var cableLeft = new Cable(vcoModel.AudioOutput, audioOutModel.LeftInput);
+            //var cableRight = new Cable(vcoModel.AudioOutput, audioOutModel.RightInput);
+            //_engine.AddCable(cableLeft);
+            //_engine.AddCable(cableRight);
         }
 
-        public void Shutdown()
-        {
-            _engine.Stop();
-            _engine.Dispose();
-        }
+        // Expose engine cable management for the UI so created cables are registered with the audio engine
+        
     }
 }
 
