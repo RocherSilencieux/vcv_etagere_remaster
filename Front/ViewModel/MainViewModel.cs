@@ -10,6 +10,9 @@ namespace vcv_etagere_remaster.Front.ViewModel
     {
         private readonly Engine _engine;
 
+        // Expose engine so the UI can call engine-level operations (cable management, stop, dispose)
+        public Engine Engine => _engine;
+
         public ObservableCollection<ModuleViewModuleBase> Modules { get; } = new ObservableCollection<ModuleViewModuleBase>();
 
         public MainViewModel()
@@ -31,16 +34,12 @@ namespace vcv_etagere_remaster.Front.ViewModel
             Modules.Add(audioOutViewModel);
 
             // Wire them together
-            var cableLeft = new Cable(vcoModel.AudioOutput, audioOutModel.LeftInput);
-            var cableRight = new Cable(vcoModel.AudioOutput, audioOutModel.RightInput);
-            _engine.AddCable(cableLeft);
-            _engine.AddCable(cableRight);
+            //var cableLeft = new Cable(vcoModel.AudioOutput, audioOutModel.LeftInput);
+            //var cableRight = new Cable(vcoModel.AudioOutput, audioOutModel.RightInput);
+            //_engine.AddCable(cableLeft);
+            //_engine.AddCable(cableRight);
         }
 
-        public void Shutdown()
-        {
-            _engine.Stop();
-            _engine.Dispose();
-        }
+        // NOTE: Cable management and engine lifecycle are handled by Engine directly.
     }
 }

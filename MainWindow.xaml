@@ -18,7 +18,7 @@
         </DataTemplate>
     </Window.Resources>
 
-    <Grid>
+    <Grid x:Name="MainGrid">
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Modules}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,50,0,0">
                 <ItemsControl.ItemsPanel>
@@ -28,5 +28,6 @@
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
         </ScrollViewer>
+        <Canvas x:Name="CableLayer" IsHitTestVisible="True" />
     </Grid>
 </Window>
