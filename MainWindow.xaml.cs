@@ -46,6 +46,7 @@ namespace vcv_etagere_remaster
             // Détection globale des clics pour gérer le glisser-déposer de câble
             this.PreviewMouseLeftButtonDown += OnPortMouseDown;
             this.PreviewMouseLeftButtonUp += OnPortMouseUp;
+
         }
 
         private void MainWindow_Closed(object? sender, EventArgs e)
@@ -101,6 +102,7 @@ namespace vcv_etagere_remaster
         // ─────────────────────────────────────────────
         private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
+
             _rightClickPosition = e.GetPosition(ModuleCanvas);
         }
 
@@ -109,13 +111,13 @@ namespace vcv_etagere_remaster
         // ─────────────────────────────────────────────
         private void AddModuleMenuItem_Click(object sender, RoutedEventArgs e)
         {
-                if (sender is MenuItem mi && mi.Tag is string moduleType)
-                {
-                    double snappedX = Math.Round(_rightClickPosition.X / GridSize) * GridSize;
-                    double snappedY = Math.Round(_rightClickPosition.Y / GridSize) * GridSize;
-                    _viewModel.AddModule(moduleType, snappedX, snappedY);
-                }
-   
+            if (sender is MenuItem mi && mi.Tag is string moduleType)
+            {
+                double snappedX = Math.Round(_rightClickPosition.X / GridSize) * GridSize;
+                double snappedY = Math.Round(_rightClickPosition.Y / GridSize) * GridSize;
+                _viewModel.AddModule(moduleType, snappedX, snappedY);
+            }
+
         }
 
         // ─────────────────────────────────────────────
@@ -123,7 +125,6 @@ namespace vcv_etagere_remaster
         // ─────────────────────────────────────────────
         private void Canvas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            // Ne démarrer le drag que si le clic vient du header (Tag="DragHandle")
             if (!IsClickFromDragHandle(e.OriginalSource as DependencyObject))
                 return;
 
@@ -235,7 +236,7 @@ namespace vcv_etagere_remaster
                         allCables.Add(newCable);
                         CableLayer.Children.Add(path);
                         newCable.AddCable(_engine); // Register the cable with the audio engine so it will be processed
-                        path.MouseRightButtonDown += (s, args) => { RemoveCable(newCable, path); }; //right click = remove cable
+                        path.MouseLeftButtonDown += (s, args) => { RemoveCable(newCable, path); }; //right click = remove cable
                         //allCables.Add(new UpdateCable
                         //{
                         //    LogicCable = newCable,
@@ -372,8 +373,6 @@ namespace vcv_etagere_remaster
         public void UpdateCablesPosition()
         {
             if (CableLayer == null) return;
-
-            // On parcourt tous les enfants du Canvas qui sont des "Path" (les câbles)
             foreach (var child in CableLayer.Children)
             {
                 if (child is Path cablePath && cablePath.Tag is Tuple<FrameworkElement, FrameworkElement> ports)
@@ -392,5 +391,32 @@ namespace vcv_etagere_remaster
                 }
             }
         }
+        // ==============================
+        // DELETE MODULE
+        // ==============================
+        //private void DeleteModule(UserControl module)
+        //{
+        //    if (module.Parent is Panel panel)
+        //        panel.Children.Remove(module);
+
+        //    // Supprimer tous les câbles liés à ce module
+        //    var cablesToRemove = allCables
+        //        .Where(c =>
+        //            c.OutPort.Visual.IsDescendantOf(module) ||
+        //            c.InPort.Visual.IsDescendantOf(module))
+        //        .ToList();
+
+        //    foreach (var cable in cablesToRemove)
+        //    {
+        //        RemoveCable(cable);
+        //    }
+
+        //    // Supprimer ports liés
+        //    allPorts.RemoveAll(p => p.Visual.IsDescendantOf(module));
+
+        //    if (module == currentMaster)
+        //        currentMaster = null;
+        //}
+
     }
 }

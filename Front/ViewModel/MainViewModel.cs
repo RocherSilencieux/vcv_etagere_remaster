@@ -129,10 +129,10 @@ namespace vcv_etagere_remaster.Front.ViewModel
         /// <summary>
         /// Supprime un module du rack et de la collection.
         /// </summary>
-       
+
 
         // Expose engine cable management for the UI so created cables are registered with the audio engine
-        
+
     }
 }
 

@@ -98,7 +98,7 @@
                         </Style>
                     </ItemsControl.ItemContainerStyle>
                 </ItemsControl>
-                <Canvas x:Name="CableLayer" IsHitTestVisible="True" Width="3000" Height="2000" />
+                <Canvas x:Name="CableLayer" IsHitTestVisible="true" Width="3000" Height="2000" />
             </Canvas>
         </ScrollViewer>
     </Grid>
