@@ -22,6 +22,6 @@ namespace vcv_etagere_remaster.Core.Interface
         /// </summary>
         float Value { get; set; }
         
-        bool IsConnected { get; }
+        bool IsConnected { get; set; }
     }
 }

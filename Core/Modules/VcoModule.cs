@@ -5,24 +5,16 @@ using vcv_etagere_remaster.Core.Utils;
 
 namespace vcv_etagere_remaster.Core.Modules
 {
-    public class SimplePort : IPort
+    public enum VcoWaveform
     {
-        public string Id { get; }
-        public string Name { get; }
-        public PortType Type { get; }
-        public float Value { get; set; }
-        public bool IsConnected { get; set; } // Simplified for now
-
-        public SimplePort(string id, string name, PortType type)
-        {
-            Id = id;
-            Name = name;
-            Type = type;
-        }
+        Sine,
+        Triangle,
+        Sawtooth,
+        Square
     }
 
     /// <summary>
-    /// A simple Voltage Controlled Oscillator outputting a Sine wave.
+    /// A Voltage Controlled Oscillator supporting Sine, Triangle, Sawtooth, and Square waves.
     /// </summary>
     public class VcoModule : IModule
     {
@@ -35,6 +27,7 @@ namespace vcv_etagere_remaster.Core.Modules
         private double _phase = 0;
         private readonly LinearRamp _baseFrequencyRamp;
         private bool _isBypassed = false;
+        private VcoWaveform _waveform = VcoWaveform.Sine;
 
         public bool IsBypassed
         {
@@ -42,10 +35,16 @@ namespace vcv_etagere_remaster.Core.Modules
             set => _isBypassed = value;
         }
 
+        public VcoWaveform Waveform
+        {
+            get => _waveform;
+            set => _waveform = value;
+        }
+
         public VcoModule()
         {
             FrequencyInput = new SimplePort(Guid.NewGuid().ToString(), "1V/Oct", PortType.Input);
-            AudioOutput = new SimplePort(Guid.NewGuid().ToString(), "Sine Out", PortType.Output);
+            AudioOutput = new SimplePort(Guid.NewGuid().ToString(), "Audio Out", PortType.Output);
             
             // 50ms ramp time at 44100Hz to smooth out slider movements
             _baseFrequencyRamp = new LinearRamp(44100, 0.05, 440.0);
@@ -70,7 +69,7 @@ namespace vcv_etagere_remaster.Core.Modules
             // 1V/Octave calculation
             double currentFrequency = currentBaseFreq * Math.Pow(2.0, FrequencyInput.Value);
 
-            // Calculate sine wave phase increment
+            // Calculate wave phase increment
             double phaseIncrement = (currentFrequency * 2.0 * Math.PI) / sampleRate;
 
             _phase += phaseIncrement;
@@ -79,8 +78,41 @@ namespace vcv_etagere_remaster.Core.Modules
                 _phase -= 2.0 * Math.PI;
             }
 
-            // Output the sine value (muted if bypassed)
-            AudioOutput.Value = _isBypassed ? 0f : (float)Math.Sin(_phase);
+            if (_isBypassed)
+            {
+                AudioOutput.Value = 0f;
+                return;
+            }
+
+            // Normalize phase to [0, 1] range for wave shape calculations
+            double t = _phase / (2.0 * Math.PI);
+            float outputSample = 0f;
+
+            switch (_waveform)
+            {
+                case VcoWaveform.Sine:
+                    outputSample = (float)Math.Sin(_phase);
+                    break;
+
+                case VcoWaveform.Triangle:
+                    if (t < 0.25)
+                        outputSample = (float)(4.0 * t);
+                    else if (t < 0.75)
+                        outputSample = (float)(2.0 - 4.0 * t);
+                    else
+                        outputSample = (float)(4.0 * t - 4.0);
+                    break;
+
+                case VcoWaveform.Sawtooth:
+                    outputSample = (float)(2.0 * t - 1.0);
+                    break;
+
+                case VcoWaveform.Square:
+                    outputSample = t < 0.5 ? 1.0f : -1.0f;
+                    break;
+            }
+
+            AudioOutput.Value = outputSample;
         }
     }
 }

@@ -25,6 +25,131 @@
         <DataTemplate DataType="{x:Type viewmodels:AdsrViewModel}">
             <views:AdsrView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:VcfViewModel}">
+            <views:VcfView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:LfoViewModel}">
+            <views:LfoView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:ScopeViewModel}">
+            <views:ScopeView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:MidiViewModel}">
+            <views:MidiView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:VcaViewModel}">
+            <views:VcaView />
+        </DataTemplate>
+
+        <!-- Piano Key Styles -->
+        <Style x:Key="WhiteKeyStyle" TargetType="Button">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#333"/>
+            <Setter Property="BorderThickness" Value="1,1,1,3"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="0,0,4,4">
+                            <TextBlock Text="{TemplateBinding Content}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,8" Foreground="Gray" FontSize="8"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#f5f5f5"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#ffd080"/>
+                    <Setter Property="BorderThickness" Value="1,3,1,1"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="BlackKeyStyle" TargetType="Button">
+            <Setter Property="Background" Value="#111"/>
+            <Setter Property="BorderBrush" Value="#222"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="80"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Panel.ZIndex" Value="2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="0,0,3,3"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#333"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#ffb347"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Piano Animations -->
+        <Storyboard x:Key="PianoFadeIn">
+            <DoubleAnimation Storyboard.TargetName="PianoTranslate"
+                             Storyboard.TargetProperty="Y"
+                             From="200" To="0" Duration="0:0:0.35">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="PianoOverlay"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0" To="1" Duration="0:0:0.25"/>
+        </Storyboard>
+
+        <Storyboard x:Key="PianoFadeOut">
+            <DoubleAnimation Storyboard.TargetName="PianoTranslate"
+                             Storyboard.TargetProperty="Y"
+                             From="0" To="200" Duration="0:0:0.35">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseIn"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="PianoOverlay"
+                             Storyboard.TargetProperty="Opacity"
+                             From="1" To="0" Duration="0:0:0.25"/>
+        </Storyboard>
+
+        <!-- Splash Animation -->
+        <Storyboard x:Key="SplashAnimation">
+            <DoubleAnimation Storyboard.TargetName="SplashTitleScale"
+                             Storyboard.TargetProperty="ScaleX"
+                             From="0.5" To="1" Duration="0:0:1.2">
+                <DoubleAnimation.EasingFunction>
+                    <ElasticEase EasingMode="EaseOut" Oscillations="1" Springiness="6"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="SplashTitleScale"
+                             Storyboard.TargetProperty="ScaleY"
+                             From="0.5" To="1" Duration="0:0:1.2">
+                <DoubleAnimation.EasingFunction>
+                    <ElasticEase EasingMode="EaseOut" Oscillations="1" Springiness="6"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="SplashSubtitleTranslate"
+                             Storyboard.TargetProperty="Y"
+                             From="50" To="0" BeginTime="0:0:0.3" Duration="0:0:0.8">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" Storyboard.TargetName="SplashOverlay"
+                             From="1" To="1" Duration="0:0:2.0"/>
+        </Storyboard>
     </Window.Resources>
 
     <Grid x:Name="MainGrid">
@@ -81,6 +206,21 @@
                         <MenuItem Header="⚡  ADSR — Enveloppe"
                                   Tag="ADSR" Click="AddModuleMenuItem_Click"
                                   Foreground="White" Background="#1e1e1e"/>
+                        <MenuItem Header="⚙️  VCF — Filtre"
+                                  Tag="VCF" Click="AddModuleMenuItem_Click"
+                                  Foreground="White" Background="#1e1e1e"/>
+                        <MenuItem Header="🌀  LFO — Modulateur"
+                                  Tag="LFO" Click="AddModuleMenuItem_Click"
+                                  Foreground="White" Background="#1e1e1e"/>
+                        <MenuItem Header="📊  SCOPE — Visualiseur"
+                                  Tag="Scope" Click="AddModuleMenuItem_Click"
+                                  Foreground="White" Background="#1e1e1e"/>
+                        <MenuItem Header="🎹  MIDI > CV — Clavier"
+                                  Tag="Midi" Click="AddModuleMenuItem_Click"
+                                  Foreground="White" Background="#1e1e1e"/>
+                        <MenuItem Header="🎛️  VCA — Amplificateur"
+                                  Tag="VCA" Click="AddModuleMenuItem_Click"
+                                  Foreground="White" Background="#1e1e1e"/>
                     </ContextMenu>
                 </Canvas.ContextMenu>
 
@@ -95,12 +235,161 @@
                         <Style TargetType="ContentPresenter">
                             <Setter Property="Canvas.Left" Value="{Binding GridX}"/>
                             <Setter Property="Canvas.Top"  Value="{Binding GridY}"/>
+                            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+                            <Setter Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="0.8" ScaleY="0.8"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Opacity" Value="0"/>
+                            <Style.Triggers>
+                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                             To="1" Duration="0:0:0.25"/>
+                                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                             To="1" Duration="0:0:0.35">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <BackEase EasingMode="EaseOut" Amplitude="0.5"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                             To="1" Duration="0:0:0.35">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <BackEase EasingMode="EaseOut" Amplitude="0.5"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Style.Triggers>
                         </Style>
                     </ItemsControl.ItemContainerStyle>
                 </ItemsControl>
                 <Canvas x:Name="CableLayer" IsHitTestVisible="true" Width="3000" Height="2000" />
             </Canvas>
         </ScrollViewer>
+
+        <!-- Piano Keyboard Overlay -->
+        <Border x:Name="PianoOverlay" VerticalAlignment="Bottom" Height="170" Background="#f2121214"
+              Margin="40,0,40,20" CornerRadius="8" Visibility="Collapsed" IsHitTestVisible="True" Panel.ZIndex="100">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="15" ShadowDepth="3" Opacity="0.6"/>
+            </Border.Effect>
+            <Border.RenderTransform>
+                <TranslateTransform x:Name="PianoTranslate" Y="200"/>
+            </Border.RenderTransform>
+            
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Piano Header -->
+                <Grid Grid.Row="0" Margin="15,8,15,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Text="🎹  VIRTUAL MIDI PIANO (Press SPACEBAR to show/close)" VerticalAlignment="Center"
+                               Foreground="#ffca80" FontSize="11" FontWeight="Bold"/>
+                    
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <TextBlock Text="OCTAVE: " Foreground="#aaa" FontSize="11" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <Button x:Name="OctaveDownBtn" Content="-" Width="24" Height="22" Click="OctaveDownBtn_Click" 
+                                Background="#2d2d30" Foreground="White" BorderBrush="#ffca80" Cursor="Hand"/>
+                        <TextBlock x:Name="OctaveTxt" Text="4" Foreground="White" FontSize="12" FontWeight="Bold" 
+                                   Width="20" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" Margin="5,0"/>
+                        <Button x:Name="OctaveUpBtn" Content="+" Width="24" Height="22" Click="OctaveUpBtn_Click"
+                                Background="#2d2d30" Foreground="White" BorderBrush="#ffca80" Cursor="Hand"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Piano Keys Container -->
+                <Grid Grid.Row="1" x:Name="PianoKeysContainer" Margin="15,5,15,15">
+                    <!-- White Keys -->
+                    <Grid x:Name="WhiteKeysGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="C" Tag="0" Style="{StaticResource WhiteKeyStyle}" 
+                                PreviewMouseLeftButtonDown="PianoKey_MouseDown" PreviewMouseLeftButtonUp="PianoKey_MouseUp" MouseLeave="PianoKey_MouseLeave"/>
+                        <Button Grid.Column="1" Content="D" Tag="2" Style="{StaticResource WhiteKeyStyle}" 
+                                PreviewMouseLeftButtonDown="PianoKey_MouseDown" PreviewMouseLeftButtonUp="PianoKey_MouseUp" MouseLeave="PianoKey_MouseLeave"/>
+                        <Button Grid.Column="2" Content="E" Tag="4" Style="{StaticResource WhiteKeyStyle}" 
+                                PreviewMouseLeftButtonDown="PianoKey_MouseDown" PreviewMouseLeftButtonUp="PianoKey_MouseUp" MouseLeave="PianoKey_MouseLeave"/>
+                        <Button Grid.Column="3" Content="F" Tag="5" Style="{StaticResource WhiteKeyStyle}" 
+                                PreviewMouseLeftButtonDown="PianoKey_MouseDown" PreviewMouseLeftButtonUp="PianoKey_MouseUp" MouseLeave="PianoKey_MouseLeave"/>
+                        <Button Grid.Column="4" Content="G" Tag="7" Style="{StaticResource WhiteKeyStyle}" 
+                                PreviewMouseLeftButtonDown="PianoKey_MouseDown" PreviewMouseLeftButtonUp="PianoKey_MouseUp" MouseLeave="PianoKey_MouseLeave"/>
+                        <Button Grid.Column="5" Content="A" Tag="9" Style="{StaticResource WhiteKeyStyle}" 
+                                PreviewMouseLeftButtonDown="PianoKey_MouseDown" PreviewMouseLeftButtonUp="PianoKey_MouseUp" MouseLeave="PianoKey_MouseLeave"/>
+                        <Button Grid.Column="6" Content="B" Tag="11" Style="{StaticResource WhiteKeyStyle}" 
+                                PreviewMouseLeftButtonDown="PianoKey_MouseDown" PreviewMouseLeftButtonUp="PianoKey_MouseUp" MouseLeave="PianoKey_MouseLeave"/>
+                        <Button Grid.Column="7" Content="C" Tag="12" Style="{StaticResource WhiteKeyStyle}" 
+                                PreviewMouseLeftButtonDown="PianoKey_MouseDown" PreviewMouseLeftButtonUp="PianoKey_MouseUp" MouseLeave="PianoKey_MouseLeave"/>
+                    </Grid>
+                    
+                    <!-- Black Keys (Overlaid) -->
+                    <Grid x:Name="BlackKeysGrid" IsHitTestVisible="True" Background="Transparent">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Button Grid.Column="0" Tag="1" Style="{StaticResource BlackKeyStyle}" HorizontalAlignment="Right" Margin="0,0,-14,0"
+                                PreviewMouseLeftButtonDown="PianoKey_MouseDown" PreviewMouseLeftButtonUp="PianoKey_MouseUp" MouseLeave="PianoKey_MouseLeave"/>
+                        <Button Grid.Column="1" Tag="3" Style="{StaticResource BlackKeyStyle}" HorizontalAlignment="Right" Margin="0,0,-14,0"
+                                PreviewMouseLeftButtonDown="PianoKey_MouseDown" PreviewMouseLeftButtonUp="PianoKey_MouseUp" MouseLeave="PianoKey_MouseLeave"/>
+                        
+                        <!-- Space between E and F -> no black key in Column 2 -->
+                        
+                        <Button Grid.Column="3" Tag="6" Style="{StaticResource BlackKeyStyle}" HorizontalAlignment="Right" Margin="0,0,-14,0"
+                                PreviewMouseLeftButtonDown="PianoKey_MouseDown" PreviewMouseLeftButtonUp="PianoKey_MouseUp" MouseLeave="PianoKey_MouseLeave"/>
+                        <Button Grid.Column="4" Tag="8" Style="{StaticResource BlackKeyStyle}" HorizontalAlignment="Right" Margin="0,0,-14,0"
+                                PreviewMouseLeftButtonDown="PianoKey_MouseDown" PreviewMouseLeftButtonUp="PianoKey_MouseUp" MouseLeave="PianoKey_MouseLeave"/>
+                        <Button Grid.Column="5" Tag="10" Style="{StaticResource BlackKeyStyle}" HorizontalAlignment="Right" Margin="0,0,-14,0"
+                                PreviewMouseLeftButtonDown="PianoKey_MouseDown" PreviewMouseLeftButtonUp="PianoKey_MouseUp" MouseLeave="PianoKey_MouseLeave"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Startup Splash Overlay -->
+        <Grid x:Name="SplashOverlay" Background="#ff0b0b0d" Panel.ZIndex="1000" IsHitTestVisible="True">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="VCV ÉTAGÈRE" Foreground="#ffca80" FontSize="62" FontWeight="Black" HorizontalAlignment="Center" Margin="0,0,0,5"
+                           RenderTransformOrigin="0.5,0.5">
+                    <TextBlock.Effect>
+                        <DropShadowEffect Color="#ffb347" BlurRadius="30" ShadowDepth="0" Opacity="0.75"/>
+                    </TextBlock.Effect>
+                    <TextBlock.RenderTransform>
+                        <ScaleTransform x:Name="SplashTitleScale" ScaleX="0.5" ScaleY="0.5"/>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+                <TextBlock Text="REMASTER" Foreground="#66ffffff" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="14,0,0,0">
+                    <TextBlock.RenderTransform>
+                        <TranslateTransform x:Name="SplashSubtitleTranslate" Y="50"/>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+                <ProgressBar IsIndeterminate="True" Height="3" Width="180" Margin="0,50,0,0" Foreground="#ffca80" Background="#222" BorderThickness="0"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>
-

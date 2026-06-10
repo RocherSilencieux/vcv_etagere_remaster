@@ -5,10 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="150"
-             Width="160" Height="360"
+             Width="160" Height="400"
              Background="#2e2e2e" BorderBrush="#1a1a1a" BorderThickness="2">
 
-    <!-- Grille racine : contenu du module + overlay du bouton ✕ -->
+    <!-- Grille racine : contenu du module + overlay du bouton -->
     <Grid>
         <Grid Margin="10">
             <Grid.RowDefinitions>
@@ -26,50 +26,30 @@
             </Border>
 
             <!-- Controls -->
-            <StackPanel Grid.Row="1" Margin="0,20,0,0">
+            <StackPanel Grid.Row="1" Margin="0,15,0,0">
                 <TextBlock Text="FREQ" Foreground="Gray" HorizontalAlignment="Center" FontSize="10"/>
-                <Slider Minimum="20" Maximum="2000" Value="{Binding BaseFrequency}"
-                        Orientation="Horizontal" Margin="0,5,0,20"/>
+                <Slider Minimum="0.0" Maximum="1.0" Value="{Binding BaseFrequency}"
+                        Orientation="Horizontal" Margin="0,5,0,15"/>
 
-                <!-- Bouton ON/OFF manuel (Bypass) -->
-                <Button Command="{Binding ToggleActiveCommand}"
-                        HorizontalAlignment="Center" Width="80" Height="28" Cursor="Hand"
-                        Margin="0,4,0,0" ToolTip="Activer/Désactiver le VCO">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border x:Name="PowerBd" CornerRadius="5" Background="#1a3d1a"
-                                                BorderBrush="#47ff47" BorderThickness="1.5">
-                                            <TextBlock x:Name="PowerTxt" Text="Power"
-                                                       Foreground="#47ff47" FontWeight="Bold" FontSize="11"
-                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <DataTrigger Binding="{Binding IsActive}" Value="False">
-                                                <Setter TargetName="PowerBd" Property="Background" Value="#3d1a1a"/>
-                                                <Setter TargetName="PowerBd" Property="BorderBrush" Value="#ff4747"/>
-                                                <Setter TargetName="PowerTxt" Property="Foreground" Value="#ff4747"/>
-                                                <Setter TargetName="PowerTxt" Property="Text" Value="Bypass"/>
-                                            </DataTrigger>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="PowerBd" Property="BorderBrush" Value="White"/>
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
+                <TextBlock Text="WAVEFORM" Foreground="Gray" FontSize="8" HorizontalAlignment="Center" Margin="0,2,0,2"/>
+                <ComboBox ItemsSource="{Binding AvailableWaveforms}"
+                          SelectedItem="{Binding SelectedWaveform}"
+                          DisplayMemberPath="Name"
+                          Background="#1a1a1a" Foreground="Black" BorderBrush="#444"
+                          FontSize="10" HorizontalContentAlignment="Stretch" Margin="0,0,0,12">
+                    <ComboBox.ItemContainerStyle>
+                        <Style TargetType="ComboBoxItem">
+                            <Setter Property="Foreground" Value="Black"/>
                         </Style>
-                    </Button.Style>
-                </Button>
+                    </ComboBox.ItemContainerStyle>
+                </ComboBox>
             </StackPanel>
 
             <!-- Input Ports -->
             <ItemsControl Grid.Row="2" ItemsSource="{Binding InputPorts}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Vertical" Margin="0,5">
+                        <StackPanel Orientation="Vertical" Margin="0,5" Background="Transparent" ToolTip="{Binding Name}">
                             <TextBlock Text="{Binding Name}" Foreground="LightGray" FontSize="10" HorizontalAlignment="Center"/>
                             <Ellipse Width="20" Height="20" Fill="#111" Stroke="Gray" StrokeThickness="2" Margin="0,2"/>
                         </StackPanel>
@@ -81,7 +61,7 @@
             <ItemsControl Grid.Row="3" ItemsSource="{Binding OutputPorts}" Margin="0,10,0,0">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Vertical" Margin="0,5">
+                        <StackPanel Orientation="Vertical" Margin="0,5" Background="Transparent" ToolTip="{Binding Name}">
                             <TextBlock Text="{Binding Name}" Foreground="LightGray" FontSize="10" HorizontalAlignment="Center"/>
                             <Ellipse Width="20" Height="20" Fill="#111" Stroke="White" StrokeThickness="2" Margin="0,2"/>
                         </StackPanel>
@@ -90,7 +70,7 @@
             </ItemsControl>
         </Grid>
 
-        <!-- Bouton ✕ suppression — overlay haut droite -->
+        <!-- Bouton suppression -->
         <Button Command="{Binding RemoveCommand}"
                 HorizontalAlignment="Right" VerticalAlignment="Top"
                 Width="22" Height="22" Margin="0,6,6,0"
@@ -113,4 +93,3 @@
         </Button>
     </Grid>
 </UserControl>
-

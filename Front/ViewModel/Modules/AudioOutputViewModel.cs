@@ -11,12 +11,12 @@ namespace vcv_etagere_remaster.Front.ViewModel.Modules
 
         public double MasterVolume
         {
-            get => _audioOutputModel != null ? _audioOutputModel.MasterVolume : 1.0;
+            get => _audioOutputModel != null ? _audioOutputModel.MasterVolume * 4.0 : 0.4;
             set
             {
                 if (_audioOutputModel != null)
                 {
-                    _audioOutputModel.MasterVolume = value;
+                    _audioOutputModel.MasterVolume = value * 0.25;
                     NotifyPropertyChanged();
                 }
             }

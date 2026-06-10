@@ -25,6 +25,17 @@ namespace vcv_etagere_remaster
         private List<Cable> allCables = new List<Cable>();
         private bool isDraggingCable = false;
         private const double GridSize = 20.0;
+        private static readonly string[] CableColors = new[]
+        {
+            "#00f5ff", // Neon Cyan
+            "#ff007f", // Hot Pink
+            "#ff6b00", // Electric Orange
+            "#ffca80", // Amber Gold
+            "#39ff14", // Acid Green
+            "#9d4edd", // Violet
+            "#00b4d8"  // Sky Blue
+        };
+        private static readonly Random _randomColorGen = new Random();
 
         // --- État du drag ---
         private ModuleViewModuleBase? _draggedModule;
@@ -47,6 +58,9 @@ namespace vcv_etagere_remaster
             this.PreviewMouseLeftButtonDown += OnPortMouseDown;
             this.PreviewMouseLeftButtonUp += OnPortMouseUp;
 
+            _viewModel.Modules.CollectionChanged += OnModulesCollectionChanged;
+            _viewModel.ModuleRemoving += OnModuleRemoving;
+            this.Loaded += (s, e) => TriggerSplashAnimation();
         }
 
         private void MainWindow_Closed(object? sender, EventArgs e)
@@ -65,13 +79,35 @@ namespace vcv_etagere_remaster
         // =========================================================================
         private void OnPortMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.OriginalSource is FrameworkElement element && element.DataContext is PortViewModelBase clickedPortVM)
+            var hitObj = e.OriginalSource as DependencyObject;
+            FrameworkElement? clickedVisual = null;
+            PortViewModelBase? clickedPortVM = null;
+
+            var current = hitObj;
+            while (current != null)
             {
+                if (current is FrameworkElement fe && fe.DataContext is PortViewModelBase pVM)
+                {
+                    clickedVisual = fe;
+                    clickedPortVM = pVM;
+                    break;
+                }
+                current = VisualTreeHelper.GetParent(current);
+            }
+
+            if (clickedPortVM != null && clickedVisual != null)
+            {
+                var ellipse = FindPortEllipse(clickedVisual);
+
                 isDraggingCable = true;
                 selectedPortVM = clickedPortVM;
-                selectedPortVisual = element;
-                this.CaptureMouse(); //capture the mouse movements
-                tempCable = new Path { Stroke = Brushes.Yellow, StrokeThickness = 4, IsHitTestVisible = false }; //create a temp cable
+                selectedPortVisual = ellipse;
+
+                // Disable hit-testing on CableLayer during dragging so that existing cables do not interfere with target selection
+                CableLayer.IsHitTestVisible = false;
+
+                this.CaptureMouse();
+                tempCable = new Path { Stroke = Brushes.Yellow, StrokeThickness = 4, IsHitTestVisible = false };
                 Panel.SetZIndex(tempCable, 1000);
                 CableLayer.Children.Add(tempCable);
 
@@ -87,10 +123,7 @@ namespace vcv_etagere_remaster
         {
             if (!isDraggingCable || tempCable == null || selectedPortVisual == null) return;
 
-            // Current mouse position relative to the CableLayer
             var pos = e.GetPosition(CableLayer);
-
-            // Compute start point as center of the selected port visual translated to CableLayer coords
             var start = selectedPortVisual.TranslatePoint(new Point(selectedPortVisual.ActualWidth / 2, selectedPortVisual.ActualHeight / 2), CableLayer);
             var end = pos;
 
@@ -102,7 +135,6 @@ namespace vcv_etagere_remaster
         // ─────────────────────────────────────────────
         private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-
             _rightClickPosition = e.GetPosition(ModuleCanvas);
         }
 
@@ -117,7 +149,6 @@ namespace vcv_etagere_remaster
                 double snappedY = Math.Round(_rightClickPosition.Y / GridSize) * GridSize;
                 _viewModel.AddModule(moduleType, snappedX, snappedY);
             }
-
         }
 
         // ─────────────────────────────────────────────
@@ -179,76 +210,98 @@ namespace vcv_etagere_remaster
                 CableLayer.Children.Remove(tempCable);
                 tempCable = null;
             }
-            var hitResult = VisualTreeHelper.HitTest(MainGrid, e.GetPosition(MainGrid)); //detect the element below the mouse
 
-            FrameworkElement targetVisual = null;
-            PortViewModelBase targetPortVM = null;
+            // Perform hit-test relative to ModuleCanvas for accurate visual intersection
+            var hitResult = VisualTreeHelper.HitTest(ModuleCanvas, e.GetPosition(ModuleCanvas));
 
-            if (hitResult != null && hitResult.VisualHit is FrameworkElement hitElement)
+            // Re-enable hit-testing on the CableLayer immediately
+            CableLayer.IsHitTestVisible = true;
+
+            FrameworkElement? targetVisual = null;
+            PortViewModelBase? targetPortVM = null;
+
+            if (hitResult != null)
             {
-                var current = hitElement;
+                var current = hitResult.VisualHit;
                 while (current != null)
                 {
-                    if (current.DataContext is PortViewModelBase pVM)
+                    if (current is FrameworkElement fe && fe.DataContext is PortViewModelBase pVM)
                     {
-                        targetVisual = current;
+                        targetVisual = fe;
                         targetPortVM = pVM;
                         break;
                     }
-                    current = VisualTreeHelper.GetParent(current) as FrameworkElement;
+                    current = VisualTreeHelper.GetParent(current);
                 }
             }
-            if (targetPortVM != null && targetPortVM != selectedPortVM) //confirm port is valid
+
+            if (targetPortVM != null && targetPortVM != selectedPortVM && selectedPortVisual != null)
             {
-                IPort sourceModel = GetInternalPort(selectedPortVM);
-                IPort destModel = GetInternalPort(targetPortVM);
+                IPort? sourceModel = GetInternalPort(selectedPortVM);
+                IPort? destModel = GetInternalPort(targetPortVM);
 
                 if (sourceModel != null && destModel != null)
                 {
-                    IPort outPortModel = null;
-                    IPort inPortModel = null;
-                    FrameworkElement outVisual = null;
-                    FrameworkElement inVisual = null;
+                    IPort? outPortModel = null;
+                    IPort? inPortModel = null;
+                    FrameworkElement? outVisual = null;
+                    FrameworkElement? inVisual = null;
 
                     if (sourceModel.Type == PortType.Output && destModel.Type == PortType.Input)
                     {
                         outPortModel = sourceModel; outVisual = selectedPortVisual;
-                        inPortModel = destModel; inVisual = targetVisual;
+                        inPortModel = destModel; inVisual = FindPortEllipse(targetVisual);
                     }
                     else if (sourceModel.Type == PortType.Input && destModel.Type == PortType.Output)
                     {
-                        outPortModel = destModel; outVisual = targetVisual;
+                        outPortModel = destModel; outVisual = FindPortEllipse(targetVisual);
                         inPortModel = sourceModel; inVisual = selectedPortVisual;
                     }
 
-                    if (outPortModel != null && inPortModel != null)
+                    if (outPortModel != null && inPortModel != null && outVisual != null && inVisual != null)
                     {
-                        var path = new Path { Stroke = Brushes.Orange, StrokeThickness = 6, Fill = Brushes.Transparent, Cursor = Cursors.Hand };
+                        // Check if this connection already exists to prevent duplicate cabling
+                        bool exists = allCables.Any(c => c.Source == outPortModel && c.Destination == inPortModel);
+                        if (!exists)
+                        {
+                            string colorStr = CableColors[_randomColorGen.Next(CableColors.Length)];
+                            var color = (Color)ColorConverter.ConvertFromString(colorStr);
+                            var brush = new SolidColorBrush(color);
 
-                        var start = outVisual.TranslatePoint(new Point(outVisual.ActualWidth / 2, outVisual.ActualHeight / 2), CableLayer);
-                        var end = inVisual.TranslatePoint(new Point(inVisual.ActualWidth / 2, inVisual.ActualHeight / 2), CableLayer);
+                            var path = new Path
+                            {
+                                Stroke = brush,
+                                StrokeThickness = 6,
+                                Fill = Brushes.Transparent,
+                                Cursor = Cursors.Hand,
+                                Effect = new System.Windows.Media.Effects.DropShadowEffect
+                                {
+                                    Color = color,
+                                    BlurRadius = 10,
+                                    ShadowDepth = 0,
+                                    Opacity = 0.85
+                                }
+                            };
 
-                        path.Data = CreateBezier(start, end);
-                        Panel.SetZIndex(path, 900);
+                            var start = outVisual.TranslatePoint(new Point(outVisual.ActualWidth / 2, outVisual.ActualHeight / 2), CableLayer);
+                            var end = inVisual.TranslatePoint(new Point(inVisual.ActualWidth / 2, inVisual.ActualHeight / 2), CableLayer);
 
-                        Cable newCable = new Cable(outPortModel, inPortModel); //create the cable preset
-                        path.Tag = Tuple.Create(outVisual, inVisual);
-                        allCables.Add(newCable);
-                        CableLayer.Children.Add(path);
-                        newCable.AddCable(_engine); // Register the cable with the audio engine so it will be processed
-                        path.MouseLeftButtonDown += (s, args) => { RemoveCable(newCable, path); }; //right click = remove cable
-                        //allCables.Add(new UpdateCable
-                        //{
-                        //    LogicCable = newCable,
-                        //    VisualPath = path,
-                        //    OutputVisual = outVisual,
-                        //    InputVisual = inVisual
-                        //});
+                            path.Data = CreateBezier(start, end);
+                            Panel.SetZIndex(path, 900);
 
+                            Cable newCable = new Cable(outPortModel, inPortModel);
+                            newCable.Visual = path;
+                            path.Tag = Tuple.Create(outVisual, inVisual);
+                            allCables.Add(newCable);
+                            CableLayer.Children.Add(path);
+                            newCable.AddCable(_engine);
+
+                            path.MouseLeftButtonDown += (s, args) => { RemoveCable(newCable, path); };
+                        }
                     }
                 }
             }
-            isDraggingCable = false;
+
             selectedPortVM = null;
             selectedPortVisual = null;
             e.Handled = true;
@@ -289,7 +342,7 @@ namespace vcv_etagere_remaster
         //==============================
         //EXTRACT FROM VIEWMODEL TO INTERNAL
         //==============================
-        private IPort GetInternalPort(PortViewModelBase vm)
+        private IPort? GetInternalPort(PortViewModelBase? vm)
         {
             if (vm == null) return null;
 
@@ -392,31 +445,341 @@ namespace vcv_etagere_remaster
             }
         }
         // ==============================
-        // DELETE MODULE
+        // COLLECTION CHANGED : CLEAN UP CABLES
         // ==============================
-        //private void DeleteModule(UserControl module)
-        //{
-        //    if (module.Parent is Panel panel)
-        //        panel.Children.Remove(module);
+        private void OnModulesCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove && e.OldItems != null)
+            {
+                foreach (var oldItem in e.OldItems)
+                {
+                    if (oldItem is ModuleViewModuleBase moduleVM)
+                    {
+                        // Collect all port models of this module VM
+                        var portsToDisconnect = new HashSet<IPort>();
+                        foreach (var portVM in moduleVM.InputPorts)
+                        {
+                            if (portVM.Model != null)
+                                portsToDisconnect.Add(portVM.Model);
+                        }
+                        foreach (var portVM in moduleVM.OutputPorts)
+                        {
+                            if (portVM.Model != null)
+                                portsToDisconnect.Add(portVM.Model);
+                        }
 
-        //    // Supprimer tous les câbles liés à ce module
-        //    var cablesToRemove = allCables
-        //        .Where(c =>
-        //            c.OutPort.Visual.IsDescendantOf(module) ||
-        //            c.InPort.Visual.IsDescendantOf(module))
-        //        .ToList();
+                        // Find all cables connected to any of these ports
+                        var cablesToRemove = allCables
+                            .Where(c => portsToDisconnect.Contains(c.Source) || portsToDisconnect.Contains(c.Destination))
+                            .ToList();
 
-        //    foreach (var cable in cablesToRemove)
-        //    {
-        //        RemoveCable(cable);
-        //    }
+                        foreach (var cable in cablesToRemove)
+                        {
+                            // Remove the visual path of the cable
+                            if (cable.Visual != null)
+                            {
+                                CableLayer.Children.Remove(cable.Visual);
+                            }
+                            else
+                            {
+                                // Fallback by looking up Tag in CableLayer Children
+                                var pathToRemove = CableLayer.Children.OfType<Path>().FirstOrDefault(path => 
+                                {
+                                    if (path.Tag is Tuple<FrameworkElement, FrameworkElement> tuple)
+                                    {
+                                        var outPortVM = tuple.Item1.DataContext as PortViewModelBase;
+                                        var inPortVM = tuple.Item2.DataContext as PortViewModelBase;
+                                        return (outPortVM != null && portsToDisconnect.Contains(outPortVM.Model)) ||
+                                               (inPortVM != null && portsToDisconnect.Contains(inPortVM.Model));
+                                    }
+                                    return false;
+                                });
+                                if (pathToRemove != null)
+                                {
+                                    CableLayer.Children.Remove(pathToRemove);
+                                }
+                            }
 
-        //    // Supprimer ports liés
-        //    allPorts.RemoveAll(p => p.Visual.IsDescendantOf(module));
+                            allCables.Remove(cable);
+                            cable.RemoveCable(_engine);
+                        }
+                    }
+                }
+            }
+        }
 
-        //    if (module == currentMaster)
-        //        currentMaster = null;
-        //}
+        // --- Virtual Piano Logic & Handlers ---
+        private bool _isPianoOpen = false;
+        private int _currentOctave = 4;
+        private readonly HashSet<Key> _pressedKeys = new HashSet<Key>();
 
+        private readonly Dictionary<Key, int> _keyboardNoteMap = new Dictionary<Key, int>
+        {
+            { Key.A, 0 },  // C
+            { Key.W, 1 },  // C#
+            { Key.S, 2 },  // D
+            { Key.E, 3 },  // D#
+            { Key.D, 4 },  // E
+            { Key.F, 5 },  // F
+            { Key.T, 6 },  // F#
+            { Key.G, 7 },  // G
+            { Key.Y, 8 },  // G#
+            { Key.H, 9 },  // A
+            { Key.U, 10 }, // A#
+            { Key.J, 11 }, // B
+            { Key.K, 12 }  // C (Octave + 1)
+        };
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                TogglePiano();
+                e.Handled = true;
+                return;
+            }
+
+            if (_isPianoOpen && _keyboardNoteMap.TryGetValue(e.Key, out int noteOffset))
+            {
+                if (!_pressedKeys.Contains(e.Key))
+                {
+                    _pressedKeys.Add(e.Key);
+                    int midiNote = (_currentOctave + 1) * 12 + noteOffset;
+                    _viewModel.SendMidiNote(midiNote);
+                    HighlightPianoKey(noteOffset, true);
+                }
+                e.Handled = true;
+            }
+            base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            if (_isPianoOpen && _keyboardNoteMap.TryGetValue(e.Key, out int noteOffset))
+            {
+                if (_pressedKeys.Contains(e.Key))
+                {
+                    _pressedKeys.Remove(e.Key);
+                    HighlightPianoKey(noteOffset, false);
+                    
+                    if (_pressedKeys.Count == 0)
+                    {
+                        _viewModel.SendMidiRelease();
+                    }
+                }
+                e.Handled = true;
+            }
+            base.OnKeyUp(e);
+        }
+
+        private void TogglePiano()
+        {
+            var fadeOut = (System.Windows.Media.Animation.Storyboard)this.Resources["PianoFadeOut"];
+            var fadeIn = (System.Windows.Media.Animation.Storyboard)this.Resources["PianoFadeIn"];
+
+            if (_isPianoOpen)
+            {
+                fadeOut.Completed += (s, e) => { PianoOverlay.Visibility = Visibility.Collapsed; };
+                fadeOut.Begin();
+                _isPianoOpen = false;
+                _pressedKeys.Clear();
+                _viewModel.SendMidiRelease();
+            }
+            else
+            {
+                PianoOverlay.Visibility = Visibility.Visible;
+                fadeIn.Begin();
+                _isPianoOpen = true;
+            }
+        }
+
+        private void HighlightPianoKey(int noteOffset, bool highlight)
+        {
+            var button = FindPianoKeyButton(noteOffset);
+            if (button != null)
+            {
+                if (highlight)
+                {
+                    bool isBlackKey = noteOffset == 1 || noteOffset == 3 || noteOffset == 6 || noteOffset == 8 || noteOffset == 10;
+                    button.Background = isBlackKey
+                        ? new SolidColorBrush(Color.FromRgb(255, 179, 71)) // Amber/orange for black keys
+                        : new SolidColorBrush(Color.FromRgb(255, 208, 128)); // Soft warm amber for white keys
+                }
+                else
+                {
+                    button.ClearValue(Button.BackgroundProperty);
+                }
+            }
+        }
+
+        private Button? FindPianoKeyButton(int noteOffset)
+        {
+            foreach (var child in WhiteKeysGrid.Children)
+            {
+                if (child is Button btn && btn.Tag is string tagStr && int.TryParse(tagStr, out int val) && val == noteOffset)
+                {
+                    return btn;
+                }
+            }
+            foreach (var child in BlackKeysGrid.Children)
+            {
+                if (child is Button btn && btn.Tag is string tagStr && int.TryParse(tagStr, out int val) && val == noteOffset)
+                {
+                    return btn;
+                }
+            }
+            return null;
+        }
+
+        private void OctaveDownBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentOctave > 0)
+            {
+                _currentOctave--;
+                OctaveTxt.Text = _currentOctave.ToString();
+            }
+        }
+
+        private void OctaveUpBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentOctave < 8)
+            {
+                _currentOctave++;
+                OctaveTxt.Text = _currentOctave.ToString();
+            }
+        }
+
+        private void PianoKey_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string tagStr && int.TryParse(tagStr, out int noteOffset))
+            {
+                btn.CaptureMouse();
+                int midiNote = (_currentOctave + 1) * 12 + noteOffset;
+                _viewModel.SendMidiNote(midiNote);
+                e.Handled = true;
+            }
+        }
+
+        private void PianoKey_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                if (btn.IsMouseCaptured)
+                {
+                    btn.ReleaseMouseCapture();
+                }
+                _viewModel.SendMidiRelease();
+                e.Handled = true;
+            }
+        }
+
+        private void PianoKey_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (sender is Button btn && btn.IsMouseCaptured)
+            {
+                btn.ReleaseMouseCapture();
+                _viewModel.SendMidiRelease();
+            }
+        }
+
+        // --- Module Exit/Removal Animation ---
+        private void OnModuleRemoving(ModuleViewModuleBase vm)
+        {
+            var container = ModulesControl.ItemContainerGenerator.ContainerFromItem(vm) as FrameworkElement;
+            if (container != null)
+            {
+                var fadeOut = new System.Windows.Media.Animation.DoubleAnimation
+                {
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(0.25)
+                };
+                
+                var scaleOutX = new System.Windows.Media.Animation.DoubleAnimation
+                {
+                    To = 0.8,
+                    Duration = TimeSpan.FromSeconds(0.25),
+                    EasingFunction = new System.Windows.Media.Animation.BackEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseIn, Amplitude = 0.5 }
+                };
+
+                var scaleOutY = new System.Windows.Media.Animation.DoubleAnimation
+                {
+                    To = 0.8,
+                    Duration = TimeSpan.FromSeconds(0.25),
+                    EasingFunction = new System.Windows.Media.Animation.BackEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseIn, Amplitude = 0.5 }
+                };
+
+                var scale = container.RenderTransform as ScaleTransform;
+                if (scale != null)
+                {
+                    fadeOut.Completed += (s, e) =>
+                    {
+                        _viewModel.Modules.Remove(vm);
+                        _engine.RemoveModule(vm.Model);
+                    };
+
+                    container.BeginAnimation(FrameworkElement.OpacityProperty, fadeOut);
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, scaleOutX);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, scaleOutY);
+                    return;
+                }
+            }
+
+            // Fallback
+            _viewModel.Modules.Remove(vm);
+            _engine.RemoveModule(vm.Model);
+        }
+
+        // --- Startup Splash Animation ---
+        private void TriggerSplashAnimation()
+        {
+            var sb = (System.Windows.Media.Animation.Storyboard)this.Resources["SplashAnimation"];
+            sb.Completed += (s, e) =>
+            {
+                var fadeOut = new System.Windows.Media.Animation.DoubleAnimation
+                {
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(0.55),
+                    EasingFunction = new System.Windows.Media.Animation.CubicEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut }
+                };
+                fadeOut.Completed += (s2, e2) => { SplashOverlay.Visibility = Visibility.Collapsed; };
+                SplashOverlay.BeginAnimation(FrameworkElement.OpacityProperty, fadeOut);
+            };
+            sb.Begin();
+        }
+
+        // --- Port visual lookup helpers ---
+        private FrameworkElement? FindPortEllipse(FrameworkElement? visual)
+        {
+            if (visual == null) return null;
+            if (visual is Ellipse) return visual;
+
+            var current = visual;
+            while (current != null)
+            {
+                if (current is StackPanel || current is Grid || current is Border || current is ContentPresenter)
+                {
+                    var ellipse = FindChild<Ellipse>(current);
+                    if (ellipse != null) return ellipse;
+                }
+                current = VisualTreeHelper.GetParent(current) as FrameworkElement;
+            }
+            return visual;
+        }
+
+        private T? FindChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            int childCount = VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < childCount; i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T typedChild)
+                {
+                    return typedChild;
+                }
+                var found = FindChild<T>(child);
+                if (found != null) return found;
+            }
+            return null;
+        }
     }
 }

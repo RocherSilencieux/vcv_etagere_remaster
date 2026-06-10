@@ -10,7 +10,7 @@ namespace vcv_etagere_remaster.Core.Audio
     {
         public IPort Source { get; }
         public IPort Destination { get; }
-        public System.Windows.Shapes.Path Visual { get; set; }
+        public System.Windows.Shapes.Path? Visual { get; set; }
         public Cable(IPort source, IPort destination)
         {
             if (source.Type != PortType.Output)
@@ -29,7 +29,7 @@ namespace vcv_etagere_remaster.Core.Audio
         /// </summary>
         public void Process()
         {
-            Destination.Value = Source.Value;
+            Destination.Value += Source.Value;
         }
 
         public void AddCable(Engine engine)

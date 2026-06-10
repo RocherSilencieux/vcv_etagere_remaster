@@ -116,7 +116,7 @@ namespace vcv_etagere_remaster.Core.Modules
         public void Process(float sampleRate)
         {
             float inputL = LeftInput.Value;
-            float inputR = RightInput.Value;
+            float inputR = RightInput.IsConnected ? RightInput.Value : inputL;
 
             if (_isBypassed)
             {

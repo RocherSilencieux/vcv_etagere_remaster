@@ -115,18 +115,11 @@ namespace vcv_etagere_remaster.Core.Audio
 
             lock (_cables)
             {
-                // SÉCURITÉ 1 : Éviter d'ajouter exactement le même câble deux fois
                 if (_cables.Contains(cable)) return;
 
-                // SÉCURITÉ 2 : Si la destination possède déjà un câble, on le déconnecte 
-                // pour éviter le court-circuit ou l'accumulation de signaux
-                var oldCable = _cables.FirstOrDefault(c => c.Destination == cable.Destination);
-                if (oldCable != null)
-                {
-                    _cables.Remove(oldCable);
-                }
-
                 _cables.Add(cable);
+                cable.Source.IsConnected = true;
+                cable.Destination.IsConnected = true;
             }
         }
 
@@ -140,10 +133,17 @@ namespace vcv_etagere_remaster.Core.Audio
                 {
                     _cables.Remove(cable);
                 }
-                // On remet la valeur de l'entrée à zéro pour couper le signal résiduel
                 if (cable.Destination != null)
                 {
-                    cable.Destination.Value = 0f;
+                    cable.Destination.IsConnected = _cables.Any(c => c.Destination == cable.Destination);
+                    if (!cable.Destination.IsConnected)
+                    {
+                        cable.Destination.Value = 0f;
+                    }
+                }
+                if (cable.Source != null)
+                {
+                    cable.Source.IsConnected = _cables.Any(c => c.Source == cable.Source);
                 }
             }
         }

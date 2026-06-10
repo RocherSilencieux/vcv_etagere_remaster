@@ -9,6 +9,8 @@ namespace vcv_etagere_remaster.Front.ViewModel.Base
     {
         protected readonly IModule _model;
 
+        public IModule Model => _model;
+
         public string Name => _model.Name;
         public string Id => _model.Id;
 

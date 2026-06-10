@@ -19,56 +19,42 @@ namespace vcv_etagere_remaster.Front.ViewModel
             // Initialize Audio Engine
             _engine = new Engine();
             _engine.Start();
-
-            // Create initial modules positionnés sur la grille
-            var vcoModel = new VcoModule();
-            _engine.AddModule(vcoModel);
-            var vcoVm = new VcoViewModel(vcoModel) { GridX = 20, GridY = 20 };
-            RegisterRemove(vcoVm);
-            Modules.Add(vcoVm);
-
-            var adsrModel = new AdsrModule();
-            _engine.AddModule(adsrModel);
-            var adsrVm = new AdsrViewModel(adsrModel) { GridX = 200, GridY = 20 };
-            RegisterRemove(adsrVm);
-            Modules.Add(adsrVm);
-
-            var delayModel = new DelayModule();
-            _engine.AddModule(delayModel);
-            var delayVm = new DelayViewModel(delayModel) { GridX = 380, GridY = 20 };
-            RegisterRemove(delayVm);
-            Modules.Add(delayVm);
-
-            var reverbModel = new ReverbModule();
-            _engine.AddModule(reverbModel);
-            var reverbVm = new ReverbViewModel(reverbModel) { GridX = 560, GridY = 20 };
-            RegisterRemove(reverbVm);
-            Modules.Add(reverbVm);
-
-            var audioOutModel = new AudioOutputModule();
-            _engine.AddModule(audioOutModel);
-            var audioOutVm = new AudioOutputViewModel(audioOutModel) { GridX = 740, GridY = 20 };
-            RegisterRemove(audioOutVm);
-            Modules.Add(audioOutVm);
-
-            // Wire them together: VCO -> ADSR -> Delay -> Reverb -> AudioOutput
-            //_engine.AddCable(new Cable(vcoModel.AudioOutput, adsrModel.AudioInput));
-            //_engine.AddCable(new Cable(adsrModel.AudioOutput, delayModel.LeftInput));
-            //_engine.AddCable(new Cable(adsrModel.AudioOutput, delayModel.RightInput));
-            
-            //_engine.AddCable(new Cable(delayModel.LeftOutput, reverbModel.LeftInput));
-            //_engine.AddCable(new Cable(delayModel.RightOutput, reverbModel.RightInput));
-            //_engine.AddCable(new Cable(reverbModel.LeftOutput, audioOutModel.LeftInput));
-            //_engine.AddCable(new Cable(reverbModel.RightOutput, audioOutModel.RightInput));
         }
+
+        public void SendMidiNote(int midiNote)
+        {
+            foreach (var module in Modules)
+            {
+                if (module.Model is MidiModule midi)
+                {
+                    midi.PlayNote(midiNote);
+                }
+            }
+        }
+
+        public void SendMidiRelease()
+        {
+            foreach (var module in Modules)
+            {
+                if (module.Model is MidiModule midi)
+                {
+                    midi.ReleaseNote();
+                }
+            }
+        }
+        public event Action<ModuleViewModuleBase>? ModuleRemoving;
+
         public void RemoveModule(ModuleViewModuleBase vm)
         {
-            Modules.Remove(vm);
-            // Wire them together
-            //var cableLeft = new Cable(vcoModel.AudioOutput, audioOutModel.LeftInput);
-            //var cableRight = new Cable(vcoModel.AudioOutput, audioOutModel.RightInput);
-            //_engine.AddCable(cableLeft);
-            //_engine.AddCable(cableRight);
+            if (ModuleRemoving != null)
+            {
+                ModuleRemoving(vm);
+            }
+            else
+            {
+                Modules.Remove(vm);
+                _engine.RemoveModule(vm.Model);
+            }
         }
 
         /// <summary>
@@ -116,6 +102,36 @@ namespace vcv_etagere_remaster.Front.ViewModel
                     var adsr = new AdsrModule();
                     _engine.AddModule(adsr);
                     vm = new AdsrViewModel(adsr) { GridX = x, GridY = y };
+                    break;
+
+                case "VCF":
+                    var vcf = new VcfModule();
+                    _engine.AddModule(vcf);
+                    vm = new VcfViewModel(vcf) { GridX = x, GridY = y };
+                    break;
+
+                case "LFO":
+                    var lfo = new LfoModule();
+                    _engine.AddModule(lfo);
+                    vm = new LfoViewModel(lfo) { GridX = x, GridY = y };
+                    break;
+
+                case "Scope":
+                    var scope = new ScopeModule();
+                    _engine.AddModule(scope);
+                    vm = new ScopeViewModel(scope) { GridX = x, GridY = y };
+                    break;
+
+                case "Midi":
+                    var midi = new MidiModule();
+                    _engine.AddModule(midi);
+                    vm = new MidiViewModel(midi) { GridX = x, GridY = y };
+                    break;
+
+                case "VCA":
+                    var vca = new VcaModule();
+                    _engine.AddModule(vca);
+                    vm = new VcaViewModel(vca) { GridX = x, GridY = y };
                     break;
             }
 

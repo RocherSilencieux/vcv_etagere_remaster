@@ -1,0 +1,96 @@
+<UserControl x:Class="vcv_etagere_remaster.Front.View.Modules.ScopeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="380" d:DesignWidth="280"
+             Width="280" Height="400"
+             Background="#252528" BorderBrush="#141416" BorderThickness="2"
+             Loaded="OnLoaded" Unloaded="OnUnloaded">
+
+    <Grid>
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Module Header — DragHandle -->
+            <Border Grid.Row="0" Background="#1c1c1f" CornerRadius="3" Padding="5,5,28,5"
+                    Tag="DragHandle" Cursor="SizeAll">
+                <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="Bold"
+                           HorizontalAlignment="Center" IsHitTestVisible="False"/>
+            </Border>
+
+            <!-- Digital Screen for Visualizer -->
+            <Border Grid.Row="1" Background="#08080c" BorderBrush="#3f3f46" BorderThickness="2" 
+                    CornerRadius="4" Margin="0,15,0,10" ClipToBounds="True">
+                <Grid x:Name="ScreenGrid">
+                    <!-- Grid Lines Background -->
+                    <Canvas x:Name="GridCanvas" Opacity="0.1"/>
+                    
+                    <!-- Waveform Paths -->
+                    <Path x:Name="LeftWavePath" Stroke="#00f3ff" StrokeThickness="1.5" Opacity="0.85"/>
+                    <Path x:Name="RightWavePath" Stroke="#ff00bb" StrokeThickness="1.5" Opacity="0.85"/>
+                    
+                    <!-- FFT Paths (Line & Fill) -->
+                    <Path x:Name="LeftFftFill" Fill="#1500f3ff"/>
+                    <Path x:Name="LeftFftPath" Stroke="#00f3ff" StrokeThickness="1.5" Opacity="0.85"/>
+                    
+                    <Path x:Name="RightFftFill" Fill="#15ff00bb"/>
+                    <Path x:Name="RightFftPath" Stroke="#ff00bb" StrokeThickness="1.5" Opacity="0.85"/>
+                </Grid>
+            </Border>
+
+            <!-- Visualizer Mode Controls -->
+            <UniformGrid Grid.Row="2" Columns="3" Margin="0,0,0,10">
+                <RadioButton x:Name="ModeScopeBtn" Content="WAVE" IsChecked="True" Style="{StaticResource {x:Type ToggleButton}}" 
+                             Height="24" Margin="2,0" Foreground="White" Background="#1f1f23" BorderBrush="#3f3f46"/>
+                <RadioButton x:Name="ModeSpectrumBtn" Content="SPEC" Style="{StaticResource {x:Type ToggleButton}}" 
+                             Height="24" Margin="2,0" Foreground="White" Background="#1f1f23" BorderBrush="#3f3f46"/>
+                <RadioButton x:Name="ModeCombinedBtn" Content="BOTH" Style="{StaticResource {x:Type ToggleButton}}" 
+                             Height="24" Margin="2,0" Foreground="White" Background="#1f1f23" BorderBrush="#3f3f46"/>
+            </UniformGrid>
+
+            <!-- Input Ports -->
+            <ItemsControl Grid.Row="3" ItemsSource="{Binding InputPorts}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical" Margin="15,2" Background="Transparent" ToolTip="{Binding Name}">
+                            <TextBlock Text="{Binding Name}" Foreground="LightGray" FontSize="9" HorizontalAlignment="Center"/>
+                            <Ellipse Width="22" Height="22" Fill="#111" Stroke="Gray" StrokeThickness="2" Margin="0,2"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+
+        <!-- Bouton suppression -->
+        <Button Command="{Binding RemoveCommand}"
+                HorizontalAlignment="Right" VerticalAlignment="Top"
+                Width="22" Height="22" Margin="0,6,6,0"
+                Cursor="Hand" ToolTip="Supprimer le Scope" Panel.ZIndex="10">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="#aa2222" CornerRadius="11" Width="22" Height="22">
+                        <TextBlock Text="✕" Foreground="White" FontSize="11" FontWeight="Bold"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#ff3333"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+    </Grid>
+</UserControl>
