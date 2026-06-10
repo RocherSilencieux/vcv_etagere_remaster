@@ -52,14 +52,23 @@ namespace vcv_etagere_remaster.Front.ViewModel
             Modules.Add(audioOutVm);
 
             // Wire them together: VCO -> ADSR -> Delay -> Reverb -> AudioOutput
-            _engine.AddCable(new Cable(vcoModel.AudioOutput, adsrModel.AudioInput));
-            _engine.AddCable(new Cable(adsrModel.AudioOutput, delayModel.LeftInput));
-            _engine.AddCable(new Cable(adsrModel.AudioOutput, delayModel.RightInput));
+            //_engine.AddCable(new Cable(vcoModel.AudioOutput, adsrModel.AudioInput));
+            //_engine.AddCable(new Cable(adsrModel.AudioOutput, delayModel.LeftInput));
+            //_engine.AddCable(new Cable(adsrModel.AudioOutput, delayModel.RightInput));
             
-            _engine.AddCable(new Cable(delayModel.LeftOutput, reverbModel.LeftInput));
-            _engine.AddCable(new Cable(delayModel.RightOutput, reverbModel.RightInput));
-            _engine.AddCable(new Cable(reverbModel.LeftOutput, audioOutModel.LeftInput));
-            _engine.AddCable(new Cable(reverbModel.RightOutput, audioOutModel.RightInput));
+            //_engine.AddCable(new Cable(delayModel.LeftOutput, reverbModel.LeftInput));
+            //_engine.AddCable(new Cable(delayModel.RightOutput, reverbModel.RightInput));
+            //_engine.AddCable(new Cable(reverbModel.LeftOutput, audioOutModel.LeftInput));
+            //_engine.AddCable(new Cable(reverbModel.RightOutput, audioOutModel.RightInput));
+        }
+        public void RemoveModule(ModuleViewModuleBase vm)
+        {
+            Modules.Remove(vm);
+            // Wire them together
+            //var cableLeft = new Cable(vcoModel.AudioOutput, audioOutModel.LeftInput);
+            //var cableRight = new Cable(vcoModel.AudioOutput, audioOutModel.RightInput);
+            //_engine.AddCable(cableLeft);
+            //_engine.AddCable(cableRight);
         }
 
         /// <summary>
@@ -120,15 +129,7 @@ namespace vcv_etagere_remaster.Front.ViewModel
         /// <summary>
         /// Supprime un module du rack et de la collection.
         /// </summary>
-        public void RemoveModule(ModuleViewModuleBase vm)
-        {
-            Modules.Remove(vm);
-            // Wire them together
-            //var cableLeft = new Cable(vcoModel.AudioOutput, audioOutModel.LeftInput);
-            //var cableRight = new Cable(vcoModel.AudioOutput, audioOutModel.RightInput);
-            //_engine.AddCable(cableLeft);
-            //_engine.AddCable(cableRight);
-        }
+       
 
         // Expose engine cable management for the UI so created cables are registered with the audio engine
         

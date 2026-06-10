@@ -27,7 +27,7 @@
         </DataTemplate>
     </Window.Resources>
 
-    <Grid>
+    <Grid x:Name="MainGrid">
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
                       Background="#0e0e0e">
             <!-- Canvas principal — grille pointillée + modules librement positionnés -->
@@ -85,8 +85,7 @@
                 </Canvas.ContextMenu>
 
                 <!-- ItemsControl des modules — panel Canvas, positions liées à GridX/GridY -->
-                <ItemsControl x:Name="ModulesControl" ItemsSource="{Binding Modules}"
-                              Canvas.Left="0" Canvas.Top="0">
+                <ItemsControl x:Name="ModulesControl" ItemsSource="{Binding Modules}" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas/>
@@ -99,18 +98,9 @@
                         </Style>
                     </ItemsControl.ItemContainerStyle>
                 </ItemsControl>
+                <Canvas x:Name="CableLayer" IsHitTestVisible="True" Width="3000" Height="2000" />
             </Canvas>
-    <Grid x:Name="MainGrid">
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Modules}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,50,0,0">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" Margin="20" HorizontalAlignment="Center" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
         </ScrollViewer>
-        <Canvas x:Name="CableLayer" IsHitTestVisible="True" />
     </Grid>
 </Window>
 

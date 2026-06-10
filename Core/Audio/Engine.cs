@@ -111,17 +111,40 @@ namespace vcv_etagere_remaster.Core.Audio
 
         public void AddCable(Cable cable)
         {
+            if (cable == null || cable.Source == null || cable.Destination == null) return;
+
             lock (_cables)
             {
+                // SÉCURITÉ 1 : Éviter d'ajouter exactement le même câble deux fois
+                if (_cables.Contains(cable)) return;
+
+                // SÉCURITÉ 2 : Si la destination possède déjà un câble, on le déconnecte 
+                // pour éviter le court-circuit ou l'accumulation de signaux
+                var oldCable = _cables.FirstOrDefault(c => c.Destination == cable.Destination);
+                if (oldCable != null)
+                {
+                    _cables.Remove(oldCable);
+                }
+
                 _cables.Add(cable);
             }
         }
 
         public void RemoveCable(Cable cable)
         {
+            if (cable == null) return;
+
             lock (_cables)
             {
-                _cables.Remove(cable);
+                if (_cables.Contains(cable))
+                {
+                    _cables.Remove(cable);
+                }
+                // On remet la valeur de l'entrée à zéro pour couper le signal résiduel
+                if (cable.Destination != null)
+                {
+                    cable.Destination.Value = 0f;
+                }
             }
         }
 
@@ -182,9 +205,17 @@ namespace vcv_etagere_remaster.Core.Audio
             {
                 for (int n = 0; n < frames; n++)
                 {
+                    foreach (var cable in _cables)
+                    {
+                        if (cable.Destination != null)
+                        {
+                            cable.Destination.Value = 0f;
+                        }
+                    }
                     // 1. Process all cables (route voltages from outputs to inputs)
                     foreach (var cable in _cables)
                     {
+
                         cable.Process();
                     }
 
