@@ -133,6 +133,12 @@ namespace vcv_etagere_remaster.Front.ViewModel
                     _engine.AddModule(vca);
                     vm = new VcaViewModel(vca) { GridX = x, GridY = y };
                     break;
+
+                case "ExternalMidi":
+                    var extMidi = new ExternalMidiModule();
+                    _engine.AddModule(extMidi);
+                    vm = new ExternalMidiViewModel(extMidi) { GridX = x, GridY = y };
+                    break;
             }
 
             if (vm != null)

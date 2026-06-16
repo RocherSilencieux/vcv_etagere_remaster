@@ -58,3 +58,10 @@
 - Registered `DelayViewModel` to `DelayView` DataTemplate mappings in `MainWindow.xaml`.
 - Patched the signal chain in `MainViewModel`: `VcoModule` -> `DelayModule` -> `ReverbModule` -> `AudioOutputModule`.
 - Created `Docs/Features/08_DelayModule.md` outlining the interpolation math, delay structures, and MVVM routing.
+
+## 2026-06-15
+- Pulled `master` branch and merged it into the `midi` branch.
+- Verified build validity (0 errors, 0 warnings).
+- Pulled `presentation` branch and merged it into the `midi` branch.
+- Created `ExternalMidiModule` using `NAudio.Midi` to capture real MIDI events from virtual or hardware inputs.
+- Created `ExternalMidiViewModel` and `ExternalMidiView` to integrate the external MIDI capabilities into the application with dynamic device selection.

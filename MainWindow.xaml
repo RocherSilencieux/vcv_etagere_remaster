@@ -40,6 +40,9 @@
         <DataTemplate DataType="{x:Type viewmodels:VcaViewModel}">
             <views:VcaView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:ExternalMidiViewModel}">
+            <views:ExternalMidiView />
+        </DataTemplate>
 
         <!-- Piano Key Styles -->
         <Style x:Key="WhiteKeyStyle" TargetType="Button">
@@ -220,6 +223,9 @@
                                   Foreground="White" Background="#1e1e1e"/>
                         <MenuItem Header="🎛️  VCA — Amplificateur"
                                   Tag="VCA" Click="AddModuleMenuItem_Click"
+                                  Foreground="White" Background="#1e1e1e"/>
+                        <MenuItem Header="🔌  EXT MIDI — Entrée externe"
+                                  Tag="ExternalMidi" Click="AddModuleMenuItem_Click"
                                   Foreground="White" Background="#1e1e1e"/>
                     </ContextMenu>
                 </Canvas.ContextMenu>

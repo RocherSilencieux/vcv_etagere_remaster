@@ -1,0 +1,80 @@
+<UserControl x:Class="vcv_etagere_remaster.Front.View.Modules.ExternalMidiView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="260" d:DesignWidth="120"
+             Width="120" Height="260"
+             Background="#2a1e33" BorderBrush="#160e1c" BorderThickness="2">
+
+    <Grid>
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Module Header — DragHandle -->
+            <Border Grid.Row="0" Background="#4a2b61" CornerRadius="3" Padding="5,5,20,5"
+                    Tag="DragHandle" Cursor="SizeAll">
+                <TextBlock Text="{Binding Name}" Foreground="#ca80ff" FontWeight="Bold"
+                           HorizontalAlignment="Center" FontSize="11" IsHitTestVisible="False"/>
+            </Border>
+
+            <!-- Device Selection -->
+            <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="5">
+                <TextBlock Text="MIDI INPUT" Foreground="#a373d4" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                
+                <ComboBox ItemsSource="{Binding AvailableDevices}" 
+                          SelectedItem="{Binding SelectedDevice}"
+                          DisplayMemberPath="Name"
+                          Width="90" Height="22" FontSize="9">
+                    <ComboBox.ItemContainerStyle>
+                        <Style TargetType="ComboBoxItem">
+                            <Setter Property="Foreground" Value="Black"/>
+                        </Style>
+                    </ComboBox.ItemContainerStyle>
+                </ComboBox>
+            </StackPanel>
+
+            <!-- Output Ports -->
+            <ItemsControl Grid.Row="2" ItemsSource="{Binding OutputPorts}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical" Margin="8,2" Background="Transparent" ToolTip="{Binding Name}">
+                            <TextBlock Text="{Binding Name}" Foreground="LightGray" FontSize="8" HorizontalAlignment="Center"/>
+                            <Ellipse Width="22" Height="22" Fill="#111" Stroke="White" StrokeThickness="2" Margin="0,1"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+
+        <!-- Remove Button -->
+        <Button Command="{Binding RemoveCommand}"
+                HorizontalAlignment="Right" VerticalAlignment="Top"
+                Width="18" Height="18" Margin="0,4,4,0"
+                Cursor="Hand" ToolTip="Remove" Panel.ZIndex="10">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="#aa2222" CornerRadius="9" Width="18" Height="18">
+                        <TextBlock Text="✕" Foreground="White" FontSize="10" FontWeight="Bold"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#ff3333"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+    </Grid>
+</UserControl>
