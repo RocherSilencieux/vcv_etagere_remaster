@@ -287,10 +287,31 @@ namespace vcv_etagere_remaster
                                 RenderTransform = new TranslateTransform(0, 12)
                             };
 
+                            // Loops Shadow path
+                            var loopsShadowPath = new Path
+                            {
+                                Name = "LoopsShadow",
+                                Stroke = new SolidColorBrush(Color.FromArgb(90, 10, 10, 15)),
+                                StrokeThickness = 6,
+                                Fill = Brushes.Transparent,
+                                IsHitTestVisible = false,
+                                RenderTransform = new TranslateTransform(0, 12)
+                            };
+
                             // 2. Dark outline border path
                             var borderPath = new Path
                             {
                                 Name = "CableBorder",
+                                Stroke = new SolidColorBrush(GetDarkerColor(color)),
+                                StrokeThickness = 8,
+                                Fill = Brushes.Transparent,
+                                IsHitTestVisible = false
+                            };
+
+                            // Loops Dark outline border path
+                            var loopsBorderPath = new Path
+                            {
+                                Name = "LoopsBorder",
                                 Stroke = new SolidColorBrush(GetDarkerColor(color)),
                                 StrokeThickness = 8,
                                 Fill = Brushes.Transparent,
@@ -307,6 +328,16 @@ namespace vcv_etagere_remaster
                                 Cursor = Cursors.Hand
                             };
 
+                            // Loops Main colored path
+                            var loopsMainPath = new Path
+                            {
+                                Name = "LoopsMain",
+                                Stroke = brush,
+                                StrokeThickness = 5,
+                                Fill = Brushes.Transparent,
+                                IsHitTestVisible = false
+                            };
+
                             // 4. White/Light highlight path
                             var highlightPath = new Path
                             {
@@ -318,14 +349,31 @@ namespace vcv_etagere_remaster
                                 RenderTransform = new TranslateTransform(0, -1)
                             };
 
+                            // Loops White/Light highlight path
+                            var loopsHighlightPath = new Path
+                            {
+                                Name = "LoopsHighlight",
+                                Stroke = new SolidColorBrush(Color.FromArgb(120, 255, 255, 255)),
+                                StrokeThickness = 1.5,
+                                Fill = Brushes.Transparent,
+                                IsHitTestVisible = false,
+                                RenderTransform = new TranslateTransform(0, -1)
+                            };
+
                             var start = outVisual.TranslatePoint(new Point(outVisual.ActualWidth / 2, outVisual.ActualHeight / 2), CableLayer);
                             var end = inVisual.TranslatePoint(new Point(inVisual.ActualWidth / 2, inVisual.ActualHeight / 2), CableLayer);
 
-                            var geometry = CreateBezier(start, end, true);
-                            shadowPath.Data = geometry;
-                            borderPath.Data = geometry;
-                            mainPath.Data = geometry;
-                            highlightPath.Data = geometry;
+                            var curveGeometry = CreateBezierCurveOnly(start, end, true);
+                            var loopsGeometry = CreateLoopsOnly(start, end, true);
+
+                            shadowPath.Data = curveGeometry;
+                            loopsShadowPath.Data = loopsGeometry;
+                            borderPath.Data = curveGeometry;
+                            loopsBorderPath.Data = loopsGeometry;
+                            mainPath.Data = curveGeometry;
+                            loopsMainPath.Data = loopsGeometry;
+                            highlightPath.Data = curveGeometry;
+                            loopsHighlightPath.Data = loopsGeometry;
 
                             // Create plugs
                             var startPlug = CreatePlugVisual(color);
@@ -338,9 +386,13 @@ namespace vcv_etagere_remaster
 
                             // Add to container in correct Z-order
                             cableContainer.Children.Add(shadowPath);
+                            cableContainer.Children.Add(loopsShadowPath);
                             cableContainer.Children.Add(borderPath);
+                            cableContainer.Children.Add(loopsBorderPath);
                             cableContainer.Children.Add(mainPath);
+                            cableContainer.Children.Add(loopsMainPath);
                             cableContainer.Children.Add(highlightPath);
+                            cableContainer.Children.Add(loopsHighlightPath);
                             cableContainer.Children.Add(startPlug);
                             cableContainer.Children.Add(endPlug);
 
@@ -355,9 +407,14 @@ namespace vcv_etagere_remaster
                             allCables.Add(newCable);
                             CableLayer.Children.Add(cableContainer);
                             
-                            newCable.AddCable(_engine);
-
-                            mainPath.MouseLeftButtonDown += (s, args) => { RemoveCable(newCable, cableContainer); };
+                             newCable.AddCable(_engine);
+ 
+                             mainPath.ToolTip = "Clic droit pour supprimer le câble";
+                             mainPath.MouseRightButtonDown += (s, args) =>
+                             {
+                                 RemoveCable(newCable, cableContainer);
+                                 args.Handled = true;
+                             };
                         }
                     }
                 }
@@ -420,6 +477,74 @@ namespace vcv_etagere_remaster
             }
 
             return new PathGeometry(new[] { figure });
+        }
+
+        private PathGeometry CreateBezierCurveOnly(Point start, Point end, bool endIsPort = true)
+        {
+            double r = 12.0; // Radius of the loop around the port
+            Point startLoopBottom = new Point(start.X, start.Y + r);
+            Point targetEndPoint = endIsPort ? new Point(end.X, end.Y + r) : end;
+
+            double dx = targetEndPoint.X - startLoopBottom.X;
+            double dy = targetEndPoint.Y - startLoopBottom.Y;
+            double distance = Math.Sqrt(dx * dx + dy * dy);
+
+            // Gravity effect (sagging downwards)
+            double horizontalFactor = Math.Clamp(Math.Abs(dx) / (distance + 0.001), 0.0, 1.0);
+            double baseSag = 40.0 + (distance * 0.35) * horizontalFactor;
+
+            double hOffset = dx * 0.25;
+
+            Point control1 = new Point(startLoopBottom.X + hOffset, startLoopBottom.Y + baseSag);
+            Point control2 = endIsPort 
+                ? new Point(targetEndPoint.X - hOffset, targetEndPoint.Y + baseSag)
+                : new Point(targetEndPoint.X, targetEndPoint.Y + baseSag * 0.5);
+
+            var figure = new PathFigure
+            {
+                StartPoint = startLoopBottom,
+                IsClosed = false
+            };
+            figure.Segments.Add(new BezierSegment(control1, control2, targetEndPoint, true));
+
+            return new PathGeometry(new[] { figure });
+        }
+
+        private PathGeometry CreateLoopsOnly(Point start, Point end, bool endIsPort = true)
+        {
+            double r = 12.0; // Radius of the loop around the port
+            Point startLoopBottom = new Point(start.X, start.Y + r);
+            Point startLoopTop = new Point(start.X, start.Y - r);
+
+            var figures = new List<PathFigure>();
+
+            // 1. Loop around the start port (clockwise complete circle)
+            var startFigure = new PathFigure
+            {
+                StartPoint = startLoopBottom,
+                IsClosed = false
+            };
+            startFigure.Segments.Add(new ArcSegment(startLoopTop, new Size(r, r), 0, false, SweepDirection.Clockwise, true));
+            startFigure.Segments.Add(new ArcSegment(startLoopBottom, new Size(r, r), 0, false, SweepDirection.Clockwise, true));
+            figures.Add(startFigure);
+
+            if (endIsPort)
+            {
+                // 2. Loop around the end port (clockwise complete circle)
+                Point targetEndPoint = new Point(end.X, end.Y + r);
+                Point endLoopTop = new Point(end.X, end.Y - r);
+
+                var endFigure = new PathFigure
+                {
+                    StartPoint = targetEndPoint,
+                    IsClosed = false
+                };
+                endFigure.Segments.Add(new ArcSegment(endLoopTop, new Size(r, r), 0, false, SweepDirection.Clockwise, true));
+                endFigure.Segments.Add(new ArcSegment(targetEndPoint, new Size(r, r), 0, false, SweepDirection.Clockwise, true));
+                figures.Add(endFigure);
+            }
+
+            return new PathGeometry(figures);
         }
         //==============================
         //DELETE CABLE
@@ -536,23 +661,31 @@ namespace vcv_etagere_remaster
                     var start = outVisual.TranslatePoint(new Point(outVisual.ActualWidth / 2, outVisual.ActualHeight / 2), CableLayer);
                     var end = inVisual.TranslatePoint(new Point(inVisual.ActualWidth / 2, inVisual.ActualHeight / 2), CableLayer);
 
-                    // Recreate Bezier geometry once
-                    var geometry = CreateBezier(start, end, true);
+                    // Recreate Bezier and loops geometry
+                    var curveGeometry = CreateBezierCurveOnly(start, end, true);
+                    var loopsGeometry = CreateLoopsOnly(start, end, true);
                     
-                    // Apply geometry to all paths in the container
+                    // Apply geometry based on path Name
                     foreach (var subChild in cableContainer.Children)
                     {
                         if (subChild is Path path)
                         {
-                            path.Data = geometry;
+                            if (path.Name != null && path.Name.StartsWith("Loops"))
+                            {
+                                path.Data = loopsGeometry;
+                            }
+                            else
+                            {
+                                path.Data = curveGeometry;
+                            }
                         }
                     }
                     
-                    // Update plug positions
-                    if (cableContainer.Children.Count >= 6)
+                    // Update plug positions (they are the last two children in the container)
+                    if (cableContainer.Children.Count >= 2)
                     {
-                        var startPlug = cableContainer.Children[4] as FrameworkElement;
-                        var endPlug = cableContainer.Children[5] as FrameworkElement;
+                        var startPlug = cableContainer.Children[cableContainer.Children.Count - 2] as FrameworkElement;
+                        var endPlug = cableContainer.Children[cableContainer.Children.Count - 1] as FrameworkElement;
                         if (startPlug != null)
                         {
                             Canvas.SetLeft(startPlug, start.X - 12);

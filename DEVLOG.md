@@ -120,3 +120,9 @@
 - Defined an implicit `DataTemplate` for `PortViewModelBase` in `Front/Themes/DarkTheme.xaml` presenting the port name, type (Input/Output), connection status, and current voltage value with a curated flat dark look.
 - Styled the global `ToolTip` control template in `Front/Themes/DarkTheme.xaml` to render with a flat dark border and subtle background matching the dark design system.
 - Replaced the simple string binding `ToolTip="{Binding Name}"` with a self binding `ToolTip="{Binding}"` across all 12 module view files (`VcoView`, `VcfView`, `VcaView`, `ScopeView`, `ReverbView`, `MixerView`, `MidiView`, `LfoView`, `ExternalMidiView`, `DelayView`, `AudioOutputView`, `AdsrView`), enabling the implicit `DataTemplate` to style the tooltip on hover.
+
+## 2026-06-18 (Non-blocking Cable Connections & Usability)
+- Mapped cable deletion event to Right-Click instead of Left-Click.
+- Separated the cable rendering geometry into `CreateBezierCurveOnly` (the hanging body) and `CreateLoopsOnly` (the decorative port loops).
+- Instantiated separate Path elements for the port loops (`LoopsShadow`, `LoopsBorder`, `LoopsMain`, `LoopsHighlight`) inside `OnPortMouseUp` and set `IsHitTestVisible = false` on them.
+- Updated `UpdateCablesPosition` to correctly assign geometries by name and retrieve plug visuals dynamically from the end of the children array, preserving visual draping behavior while ensuring that clicking on cabled ports initiates a new connection drag.

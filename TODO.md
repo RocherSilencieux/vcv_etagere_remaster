@@ -1,5 +1,11 @@
 # TODO
 
+- [x] Change cable deletion trigger to Right-Click instead of Left-Click to prevent accidental deletions when dragging multiple cables from the same port.
+  - [x] Map deletion to right-click in MainWindow.xaml.cs.
+  - [x] Split cable geometry to separate decorative port loops from the hit-testable main curve.
+  - [x] Set IsHitTestVisible = false on loop paths.
+  - [x] Update UpdateCablesPosition to handle loop and curve geometries separately and dynamically find plug visuals.
+- [x] Add hover tooltip 'Clic droit pour supprimer le câble' to the cable visual.
 - [x] Expose detailed display properties in PortViewModelBase.cs.
 - [x] Implement custom styled ToolTip for ports in all 12 module views.
 - [x] Merge all mixer branch changes into master and create tweaks branch.
