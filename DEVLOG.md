@@ -114,3 +114,9 @@
 ## 2026-06-18 (Branch Merge and Tweaks Branch)
 - Merged the `mixer` branch containing the 2-Channel Mixer module implementation and UI adjustments into the `master` branch.
 - Created and switched to a new development branch named `tweaks`.
+
+## 2026-06-18 (Port Hover Tooltips)
+- Added `TypeDisplay`, `StatusDisplay`, `ConnectionColor`, and `ValueDisplay` helper properties on `PortViewModelBase.cs` to enable structured bindings in the tooltip template.
+- Defined an implicit `DataTemplate` for `PortViewModelBase` in `Front/Themes/DarkTheme.xaml` presenting the port name, type (Input/Output), connection status, and current voltage value with a curated flat dark look.
+- Styled the global `ToolTip` control template in `Front/Themes/DarkTheme.xaml` to render with a flat dark border and subtle background matching the dark design system.
+- Replaced the simple string binding `ToolTip="{Binding Name}"` with a self binding `ToolTip="{Binding}"` across all 12 module view files (`VcoView`, `VcfView`, `VcaView`, `ScopeView`, `ReverbView`, `MixerView`, `MidiView`, `LfoView`, `ExternalMidiView`, `DelayView`, `AudioOutputView`, `AdsrView`), enabling the implicit `DataTemplate` to style the tooltip on hover.

@@ -48,7 +48,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Vertical" Margin="4,2" Background="Transparent" ToolTip="{Binding Name}">
+                        <StackPanel Orientation="Vertical" Margin="4,2" Background="Transparent" ToolTip="{Binding}">
                             <TextBlock Text="{Binding Name}" Foreground="LightGray" FontSize="8" HorizontalAlignment="Center"/>
                             <Ellipse Width="20" Height="20" Fill="#111" Stroke="#9bbdf0" StrokeThickness="2" Margin="0,1"/>
                         </StackPanel>
@@ -65,7 +65,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Vertical" Margin="4,2" Background="Transparent" ToolTip="{Binding Name}">
+                        <StackPanel Orientation="Vertical" Margin="4,2" Background="Transparent" ToolTip="{Binding}">
                             <TextBlock Text="{Binding Name}" Foreground="LightGray" FontSize="8" HorizontalAlignment="Center"/>
                             <Ellipse Width="20" Height="20" Fill="#111" Stroke="White" StrokeThickness="2" Margin="0,1"/>
                         </StackPanel>

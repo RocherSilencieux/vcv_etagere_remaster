@@ -23,6 +23,11 @@ namespace vcv_etagere_remaster.Front.ViewModel.Base
             // The setter will be driven by the Model's state change in the future
         }
 
+        public string TypeDisplay => Type == PortType.Input ? "Entrée (IN)" : "Sortie (OUT)";
+        public string StatusDisplay => IsConnected ? "Connecté" : "Déconnecté";
+        public string ConnectionColor => IsConnected ? "#4CAF50" : "#F44336"; // Green / Red
+        public string ValueDisplay => $"{_model.Value:F3} V";
+
         public PortViewModelBase(IPort model)
         {
             _model = model;

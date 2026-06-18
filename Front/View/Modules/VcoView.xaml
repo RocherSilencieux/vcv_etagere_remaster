@@ -42,7 +42,7 @@
             <ItemsControl Grid.Row="2" ItemsSource="{Binding InputPorts}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Vertical" Margin="0,5" Background="Transparent" ToolTip="{Binding Name}">
+                        <StackPanel Orientation="Vertical" Margin="0,5" Background="Transparent" ToolTip="{Binding}">
                             <TextBlock Text="{Binding Name}" Foreground="LightGray" FontSize="10" HorizontalAlignment="Center"/>
                             <Ellipse Width="20" Height="20" Fill="#111" Stroke="Gray" StrokeThickness="2" Margin="0,2"/>
                         </StackPanel>
@@ -54,7 +54,7 @@
             <ItemsControl Grid.Row="3" ItemsSource="{Binding OutputPorts}" Margin="0,10,0,0">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Vertical" Margin="0,5" Background="Transparent" ToolTip="{Binding Name}">
+                        <StackPanel Orientation="Vertical" Margin="0,5" Background="Transparent" ToolTip="{Binding}">
                             <TextBlock Text="{Binding Name}" Foreground="LightGray" FontSize="10" HorizontalAlignment="Center"/>
                             <Ellipse Width="20" Height="20" Fill="#111" Stroke="White" StrokeThickness="2" Margin="0,2"/>
                         </StackPanel>

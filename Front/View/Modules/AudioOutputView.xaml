@@ -40,7 +40,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Vertical" Margin="5,2" Background="Transparent" ToolTip="{Binding Name}">
+                        <StackPanel Orientation="Vertical" Margin="5,2" Background="Transparent" ToolTip="{Binding}">
                             <TextBlock Text="{Binding Name}" Foreground="LightGray" FontSize="10" HorizontalAlignment="Center"/>
                             <Ellipse Width="25" Height="25" Fill="#111" Stroke="#ff4444" StrokeThickness="2" Margin="0,2"/>
                         </StackPanel>
