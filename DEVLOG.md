@@ -95,3 +95,9 @@
 - Merged the new stylesheet in App.xaml to apply it application-wide.
 - Cleaned up inline styles and ItemContainerStyle overrides in all module views (Vco, Vcf, Lfo, Delay, ExternalMidi, AudioOutput) to inherit the clean dark theme.
 - Simplified MainWindow.xaml by removing local Menu resources.
+
+## 2026-06-18 (Investigation & Hotfix)
+- Clean compiled the codebase (0 errors, 0 warnings).
+- Prevented potential startup crashes in `Engine.cs` constructor where `new WaveOutEvent()` was instantiated before runtime safety checks. Modified it to be null-safe and instantiated dynamically during playback start or device changes.
+- Wrapped `MidiIn` queries in `ExternalMidiModule.cs` inside defensive `try-catch` blocks to prevent crash failures when running on target environments without sound/MIDI cards or broken audio drivers.
+- Ran a clean rebuild after clearing `obj` and `bin` cache directories, verifying compilation successfully completes with 0 errors and 0 warnings.

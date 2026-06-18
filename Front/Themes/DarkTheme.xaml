@@ -69,7 +69,7 @@
                         CornerRadius="3"
                         MinHeight="20"
                         MaxHeight="{TemplateBinding MaxDropDownHeight}"
-                        MinWidth="{Binding ActualWidth, ElementName=templateRoot}">
+                        MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
                     <ScrollViewer x:Name="dropDownScrollViewer" SnapsToDevicePixels="True">
                         <ItemsPresenter x:Name="itemsPresenter" 
                                         KeyboardNavigation.DirectionalNavigation="Contained"/>
@@ -227,7 +227,6 @@
                         </Trigger>
                         <Trigger Property="Role" Value="TopLevelItem">
                             <Setter TargetName="RightArrow" Property="Visibility" Value="Collapsed"/>
-                            <Setter TargetName="INT_Popup" Property="IsOpen" Value="False"/>
                         </Trigger>
                         <Trigger Property="Role" Value="SubmenuHeader">
                             <Setter TargetName="RightArrow" Property="Visibility" Value="Visible"/>
@@ -235,7 +234,6 @@
                         </Trigger>
                         <Trigger Property="Role" Value="SubmenuItem">
                             <Setter TargetName="RightArrow" Property="Visibility" Value="Collapsed"/>
-                            <Setter TargetName="INT_Popup" Property="IsOpen" Value="False"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="false">
                             <Setter Property="Foreground" Value="#555555"/>

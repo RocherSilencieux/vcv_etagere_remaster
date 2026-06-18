@@ -1,5 +1,7 @@
 # TODO
 
+- [x] Investigate and resolve launching error reported by the user (prevent constructor-level exceptions in Engine and ExternalMidiModule).
+
 - [x] Analyze NAudio documentation.
 - [x] Create project overview document (`Docs/PROJECT_OVERVIEW.md`).
 - [x] Verify the existing codebase builds correctly and fix any warnings.

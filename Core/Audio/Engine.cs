@@ -16,7 +16,7 @@ namespace vcv_etagere_remaster.Core.Audio
         private readonly List<Cable> _cables = new List<Cable>();
         
         // You can change to AsioOut if ASIO is required for ultra low latency
-        private IWavePlayer _waveOut; 
+        private IWavePlayer? _waveOut; 
         private int _currentDeviceNumber = -1;
         private bool _isPlaying = false;
 
@@ -27,7 +27,6 @@ namespace vcv_etagere_remaster.Core.Audio
         {
             // Standard stereo 44.1kHz floating point audio
             WaveFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100, 2);
-            _waveOut = new WaveOutEvent() { DeviceNumber = _currentDeviceNumber, DesiredLatency = 100 }; // 100ms latency for safety without ASIO
         }
 
         public void AddModule(IModule module)
@@ -76,11 +75,11 @@ namespace vcv_etagere_remaster.Core.Audio
                 {
                     try
                     {
-                        _waveOut.Stop();
+                        _waveOut?.Stop();
                     }
                     catch { }
 
-                    _waveOut.Dispose();
+                    _waveOut?.Dispose();
 
                     _waveOut = new WaveOutEvent()
                     {
@@ -100,12 +99,8 @@ namespace vcv_etagere_remaster.Core.Audio
                 }
                 else
                 {
-                    _waveOut.Dispose();
-                    _waveOut = new WaveOutEvent()
-                    {
-                        DeviceNumber = _currentDeviceNumber,
-                        DesiredLatency = 100
-                    };
+                    _waveOut?.Dispose();
+                    _waveOut = null;
                 }
             }
         }
@@ -157,7 +152,7 @@ namespace vcv_etagere_remaster.Core.Audio
 
                 try
                 {
-                    _waveOut.Dispose();
+                    _waveOut?.Dispose();
                     _waveOut = new WaveOutEvent()
                     {
                         DeviceNumber = _currentDeviceNumber,
@@ -182,7 +177,7 @@ namespace vcv_etagere_remaster.Core.Audio
 
                 try
                 {
-                    _waveOut.Stop();
+                    _waveOut?.Stop();
                 }
                 catch (Exception ex)
                 {

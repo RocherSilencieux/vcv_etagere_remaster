@@ -33,9 +33,24 @@ namespace vcv_etagere_remaster.Core.Modules
         public List<MidiDevice> GetAvailableDevices()
         {
             var devices = new List<MidiDevice>();
-            for (int i = 0; i < MidiIn.NumberOfDevices; i++)
+            try
             {
-                devices.Add(new MidiDevice { DeviceNumber = i, Name = MidiIn.DeviceInfo(i).ProductName });
+                int count = MidiIn.NumberOfDevices;
+                for (int i = 0; i < count; i++)
+                {
+                    try
+                    {
+                        devices.Add(new MidiDevice { DeviceNumber = i, Name = MidiIn.DeviceInfo(i).ProductName });
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Error getting MIDI device capabilities for {i}: {ex.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error querying MIDI devices: {ex.Message}");
             }
             return devices;
         }
