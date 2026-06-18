@@ -1,5 +1,10 @@
 # TODO
 
+- [x] Refine Eurorack snapping rail system.
+  - [x] Make background rails design more sober (remove row backgrounds, make rails thin dark grey rectangles).
+  - [x] Implement a floating snapping toggle panel in the top-left of the canvas.
+  - [x] Bind visual rails visibility to the snapping toggle state.
+  - [x] Update snapping drag/drop and spawn logic to respect the snapping toggle.
 - [x] Implement a Eurorack horizontal rail system with snapping.
   - [x] Define visual rack rails in MainWindow.xaml.
   - [x] Implement snapping logic in MainWindow.xaml.cs.

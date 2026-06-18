@@ -151,20 +151,28 @@ namespace vcv_etagere_remaster
             {
                 double snappedX = Math.Round(_rightClickPosition.X / GridSize) * GridSize;
                 
-                // Snap Y to the nearest Eurorack rail row
-                double nearestY = RowTops[0];
-                double minDiff = double.MaxValue;
-                foreach (double rowTop in RowTops)
+                if (SnappingToggle.IsChecked == true)
                 {
-                    double diff = Math.Abs(_rightClickPosition.Y - rowTop);
-                    if (diff < minDiff)
+                    // Snap Y to the nearest Eurorack rail row
+                    double nearestY = RowTops[0];
+                    double minDiff = double.MaxValue;
+                    foreach (double rowTop in RowTops)
                     {
-                        minDiff = diff;
-                        nearestY = rowTop;
+                        double diff = Math.Abs(_rightClickPosition.Y - rowTop);
+                        if (diff < minDiff)
+                        {
+                            minDiff = diff;
+                            nearestY = rowTop;
+                        }
                     }
+                    _viewModel.AddModule(moduleType, snappedX, nearestY);
                 }
-
-                _viewModel.AddModule(moduleType, snappedX, nearestY);
+                else
+                {
+                    // Free placement, snap Y to standard 20px grid
+                    double snappedY = Math.Round(_rightClickPosition.Y / GridSize) * GridSize;
+                    _viewModel.AddModule(moduleType, snappedX, snappedY);
+                }
             }
         }
 
@@ -602,19 +610,27 @@ namespace vcv_etagere_remaster
             // Snap à la grille au relâchement
             _draggedModule.GridX = Math.Round(_draggedModule.GridX / GridSize) * GridSize;
 
-            // Snap Y to the nearest Eurorack rail row
-            double nearestY = RowTops[0];
-            double minDiff = double.MaxValue;
-            foreach (double rowTop in RowTops)
+            if (SnappingToggle.IsChecked == true)
             {
-                double diff = Math.Abs(_draggedModule.GridY - rowTop);
-                if (diff < minDiff)
+                // Snap Y to the nearest Eurorack rail row
+                double nearestY = RowTops[0];
+                double minDiff = double.MaxValue;
+                foreach (double rowTop in RowTops)
                 {
-                    minDiff = diff;
-                    nearestY = rowTop;
+                    double diff = Math.Abs(_draggedModule.GridY - rowTop);
+                    if (diff < minDiff)
+                    {
+                        minDiff = diff;
+                        nearestY = rowTop;
+                    }
                 }
+                _draggedModule.GridY = nearestY;
             }
-            _draggedModule.GridY = nearestY;
+            else
+            {
+                // Free placement, snap GridY to standard 20px grid
+                _draggedModule.GridY = Math.Round(_draggedModule.GridY / GridSize) * GridSize;
+            }
 
             UpdateCablesPosition();
             FinishDrag();

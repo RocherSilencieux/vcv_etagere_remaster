@@ -133,3 +133,9 @@
 - Declared a constant array `RowTops` representing the top coordinates of the rows (`20`, `460`, `900`, `1340`).
 - Updated `Canvas_PreviewMouseLeftButtonUp` to snap the dropped module's `GridY` coordinate to the nearest coordinate in `RowTops`.
 - Updated `AddModuleMenuItem_Click` to snap the spawned module's Y position to the nearest rail coordinate in `RowTops` on right-click creation.
+
+## 2026-06-18 (Mounting Rails Snapping Refinements)
+- Refactored `RackBackground` visual rails in `MainWindow.xaml`: removed row background borders (panels) and replaced thick silver rails with thin, sober, charcoal-grey lines (`#2c2c30`, `Height="2"`).
+- Added a floating `SnappingOverlay` control panel in the top-left corner of `MainWindow.xaml` containing a custom-styled `ToggleButton` named `SnappingToggle`.
+- Configured a dynamic binding on `RackBackground.Visibility` to hide the visual background rails when snapping is disabled.
+- Updated `Canvas_PreviewMouseLeftButtonUp` and `AddModuleMenuItem_Click` in `MainWindow.xaml.cs` to check `SnappingToggle.IsChecked` and apply rail snapping conditionally (falling back to standard 20px grid alignment when disabled).
