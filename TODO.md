@@ -1,5 +1,6 @@
 # TODO
 
+- [x] Clean up inline styles from Canvas ContextMenu in MainWindow.xaml to apply global DarkTheme correctly.
 - [x] Investigate and resolve launching error reported by the user (prevent constructor-level exceptions in Engine and ExternalMidiModule).
 
 - [x] Analyze NAudio documentation.

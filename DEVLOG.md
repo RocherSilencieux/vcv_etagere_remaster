@@ -101,3 +101,4 @@
 - Prevented potential startup crashes in `Engine.cs` constructor where `new WaveOutEvent()` was instantiated before runtime safety checks. Modified it to be null-safe and instantiated dynamically during playback start or device changes.
 - Wrapped `MidiIn` queries in `ExternalMidiModule.cs` inside defensive `try-catch` blocks to prevent crash failures when running on target environments without sound/MIDI cards or broken audio drivers.
 - Ran a clean rebuild after clearing `obj` and `bin` cache directories, verifying compilation successfully completes with 0 errors and 0 warnings.
+- Cleaned up inline `Foreground` and `Background` property overrides from the canvas `ContextMenu` and its child `MenuItem` elements in `MainWindow.xaml` so that they correctly inherit the modern flat style definitions from the global `DarkTheme.xaml`.

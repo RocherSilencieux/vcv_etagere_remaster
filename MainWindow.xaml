@@ -214,46 +214,21 @@
 
                 <!-- Menu contextuel clic droit : ajouter un module -->
                 <Canvas.ContextMenu>
-                    <ContextMenu Background="#1e1e1e" BorderBrush="#444" BorderThickness="1">
-                        <MenuItem Header="＋  Ajouter un module" IsEnabled="False"
-                                  FontWeight="Bold" Foreground="#666" FontSize="11"/>
+                    <ContextMenu>
+                        <MenuItem Header="＋  Ajouter un module" IsEnabled="False" FontWeight="Bold"/>
                         <Separator/>
-                        <MenuItem Header="🎵  VCO — Oscillateur"
-                                  Tag="VCO" Click="AddModuleMenuItem_Click"
-                                  Foreground="White" Background="#1e1e1e"/>
-                        <MenuItem Header="🔁  Delay"
-                                  Tag="Delay" Click="AddModuleMenuItem_Click"
-                                  Foreground="White" Background="#1e1e1e"/>
-                        <MenuItem Header="🌊  Reverb"
-                                  Tag="Reverb" Click="AddModuleMenuItem_Click"
-                                  Foreground="White" Background="#1e1e1e"/>
-                        <MenuItem Header="🔊  Sortie Audio"
-                                  Tag="AudioOutput" Click="AddModuleMenuItem_Click"
-                                  Foreground="White" Background="#1e1e1e"/>
-                        <MenuItem Header="⚡  ADSR — Enveloppe"
-                                  Tag="ADSR" Click="AddModuleMenuItem_Click"
-                                  Foreground="White" Background="#1e1e1e"/>
-                        <MenuItem Header="⚙️  VCF — Filtre"
-                                  Tag="VCF" Click="AddModuleMenuItem_Click"
-                                  Foreground="White" Background="#1e1e1e"/>
-                        <MenuItem Header="🌀  LFO — Modulateur"
-                                  Tag="LFO" Click="AddModuleMenuItem_Click"
-                                  Foreground="White" Background="#1e1e1e"/>
-                        <MenuItem Header="📊  SCOPE — Visualiseur"
-                                  Tag="Scope" Click="AddModuleMenuItem_Click"
-                                  Foreground="White" Background="#1e1e1e"/>
-                        <MenuItem Header="🎹  MIDI > CV — Clavier"
-                                  Tag="Midi" Click="AddModuleMenuItem_Click"
-                                  Foreground="White" Background="#1e1e1e"/>
-                        <MenuItem Header="🎛️  VCA — Amplificateur"
-                                  Tag="VCA" Click="AddModuleMenuItem_Click"
-                                  Foreground="White" Background="#1e1e1e"/>
-                        <MenuItem Header="🔌  EXT MIDI — Entrée externe"
-                                  Tag="ExternalMidi" Click="AddModuleMenuItem_Click"
-                                  Foreground="White" Background="#1e1e1e"/>
-                        <MenuItem Header="🎚️  Mixer — 2-Channel Mixer"
-                                  Tag="Mixer" Click="AddModuleMenuItem_Click"
-                                  Foreground="White" Background="#1e1e1e"/>
+                        <MenuItem Header="🎵  VCO — Oscillateur" Tag="VCO" Click="AddModuleMenuItem_Click"/>
+                        <MenuItem Header="🔁  Delay" Tag="Delay" Click="AddModuleMenuItem_Click"/>
+                        <MenuItem Header="🌊  Reverb" Tag="Reverb" Click="AddModuleMenuItem_Click"/>
+                        <MenuItem Header="🔊  Sortie Audio" Tag="AudioOutput" Click="AddModuleMenuItem_Click"/>
+                        <MenuItem Header="⚡  ADSR — Enveloppe" Tag="ADSR" Click="AddModuleMenuItem_Click"/>
+                        <MenuItem Header="⚙️  VCF — Filtre" Tag="VCF" Click="AddModuleMenuItem_Click"/>
+                        <MenuItem Header="🌀  LFO — Modulateur" Tag="LFO" Click="AddModuleMenuItem_Click"/>
+                        <MenuItem Header="📊  SCOPE — Visualiseur" Tag="Scope" Click="AddModuleMenuItem_Click"/>
+                        <MenuItem Header="🎹  MIDI > CV — Clavier" Tag="Midi" Click="AddModuleMenuItem_Click"/>
+                        <MenuItem Header="🎛️  VCA — Amplificateur" Tag="VCA" Click="AddModuleMenuItem_Click"/>
+                        <MenuItem Header="🔌  EXT MIDI — Entrée externe" Tag="ExternalMidi" Click="AddModuleMenuItem_Click"/>
+                        <MenuItem Header="🎚️  Mixer — 2-Channel Mixer" Tag="Mixer" Click="AddModuleMenuItem_Click"/>
                     </ContextMenu>
                 </Canvas.ContextMenu>
 
