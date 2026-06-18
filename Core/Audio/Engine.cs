@@ -21,6 +21,7 @@ namespace vcv_etagere_remaster.Core.Audio
         private bool _isPlaying = false;
 
         public WaveFormat WaveFormat { get; }
+        public bool IsPlaying => _isPlaying;
 
         public Engine()
         {
@@ -192,11 +193,16 @@ namespace vcv_etagere_remaster.Core.Audio
         }
 
 
+        private double _dspLoad = 0.0;
+        public double DspLoad => _dspLoad;
+
         /// <summary>
         /// This method is called by NAudio to request the next block of audio.
         /// </summary>
         public int Read(float[] buffer, int offset, int count)
         {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+
             // Process per sample frame (left + right = 1 frame for stereo)
             int channels = WaveFormat.Channels;
             int frames = count / channels;
@@ -247,6 +253,14 @@ namespace vcv_etagere_remaster.Core.Audio
                     buffer[offset + n * channels + 1] = rightMix; // Right
                 }
             }
+
+            sw.Stop();
+            double bufferDurationSec = (double)count / (WaveFormat.SampleRate * WaveFormat.Channels);
+            double processDurationSec = (double)sw.ElapsedTicks / System.Diagnostics.Stopwatch.Frequency;
+            double currentLoad = (processDurationSec / (bufferDurationSec + 0.0001)) * 100.0;
+            
+            // Exponential moving average for smoothing
+            _dspLoad = (_dspLoad * 0.95) + (currentLoad * 0.05);
 
             return count; // Always return count, meaning we infinitely generate audio
         }

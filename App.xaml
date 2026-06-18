@@ -6,8 +6,5 @@
              xmlns:ViewModele="clr-namespace:vcv_etagere_remaster.Front.ViewModel.Base">
               
     <Application.Resources>
-        <DataTemplate DataType="">
-            
-        </DataTemplate>
     </Application.Resources>
 </Application>

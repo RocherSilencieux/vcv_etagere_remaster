@@ -65,3 +65,23 @@
 - Pulled `presentation` branch and merged it into the `midi` branch.
 - Created `ExternalMidiModule` using `NAudio.Midi` to capture real MIDI events from virtual or hardware inputs.
 - Created `ExternalMidiViewModel` and `ExternalMidiView` to integrate the external MIDI capabilities into the application with dynamic device selection.
+
+## 2026-06-16
+- Removed invalid empty `<DataTemplate DataType="">` from `App.xaml` to resolve silent WPF markup compilation errors and the resulting CS5001 missing entry point error.
+- Implemented a gravity-simulated Bézier curve approximation in `MainWindow.xaml.cs` to model natural cable drape based on horizontal span and distance.
+- Implemented circular port-wrapping loops around module ports at the start and end of each cable in `MainWindow.xaml.cs` using WPF `ArcSegment`s.
+- Adjusted port loops to be strictly fixed to actual module ports (removing the loop at the mouse cursor during dragging).
+- Aligned start and end coordinates of the cable to the bottom border of the port circles so the line begins and ends on the port edges instead of the center.
+- Created and updated highly detailed feature documentation in `Docs/Features/09_Gravity_Cables.md` detailing the gravity and wrapping loop implementation.
+- Verified project compilation (0 build errors, 0 warnings).
+
+## 2026-06-18
+- Upgraded cable rendering system from a single Path to a composite FrameworkElement container Canvas.
+- Implemented visual optimizations: shared single PathGeometry object among shadow, border, main, and highlight paths to avoid redundant Bézier math on the UI thread.
+- Replaced CPU-expensive DropShadowEffect with a TranslateTransform translation running entirely on the GPU for the cable shadow.
+- Rendered premium 3D patch plugs at both cable endpoints with multi-layered Ellipse geometries representing outer metal barrels, colored sleeves, rubber boots, and specular reflections.
+- Updated module drag updating loop (UpdateCablesPosition) and modules collection changed handler (OnModulesCollectionChanged) to cleanly manipulate and dispose of the new Canvas containers.
+- Re-structured MainWindow.xaml using Grid RowDefinitions to add a dark-themed main Menu bar (File, View, Engine).
+- Integrated command click handlers: File (Clear Patch, Exit), View (Toggle Perf Monitor, Toggle Piano), and Engine (Toggle Audio Status).
+- Configured Performance Monitor overlay in the top-right corner inside the canvas region, tracking FPS, DSP Load %, module count, and active cable count.
+- Verified build compiles cleanly with 0 warnings and 0 errors.

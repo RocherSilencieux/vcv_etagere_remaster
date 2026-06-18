@@ -61,6 +61,9 @@ namespace vcv_etagere_remaster
             _viewModel.Modules.CollectionChanged += OnModulesCollectionChanged;
             _viewModel.ModuleRemoving += OnModuleRemoving;
             this.Loaded += (s, e) => TriggerSplashAnimation();
+
+            // Performance monitoring
+            CompositionTarget.Rendering += UpdatePerformanceStats;
         }
 
         private void MainWindow_Closed(object? sender, EventArgs e)
@@ -127,7 +130,7 @@ namespace vcv_etagere_remaster
             var start = selectedPortVisual.TranslatePoint(new Point(selectedPortVisual.ActualWidth / 2, selectedPortVisual.ActualHeight / 2), CableLayer);
             var end = pos;
 
-            tempCable.Data = CreateBezier(start, end);
+            tempCable.Data = CreateBezier(start, end, false);
         }
 
         // ─────────────────────────────────────────────
@@ -268,35 +271,93 @@ namespace vcv_etagere_remaster
                             var color = (Color)ColorConverter.ConvertFromString(colorStr);
                             var brush = new SolidColorBrush(color);
 
-                            var path = new Path
+                            var cableContainer = new Canvas
                             {
-                                Stroke = brush,
+                                IsHitTestVisible = true
+                            };
+
+                            // 1. Shadow path
+                            var shadowPath = new Path
+                            {
+                                Name = "CableShadow",
+                                Stroke = new SolidColorBrush(Color.FromArgb(90, 10, 10, 15)),
                                 StrokeThickness = 6,
                                 Fill = Brushes.Transparent,
-                                Cursor = Cursors.Hand,
-                                Effect = new System.Windows.Media.Effects.DropShadowEffect
-                                {
-                                    Color = color,
-                                    BlurRadius = 10,
-                                    ShadowDepth = 0,
-                                    Opacity = 0.85
-                                }
+                                IsHitTestVisible = false,
+                                RenderTransform = new TranslateTransform(0, 12)
+                            };
+
+                            // 2. Dark outline border path
+                            var borderPath = new Path
+                            {
+                                Name = "CableBorder",
+                                Stroke = new SolidColorBrush(GetDarkerColor(color)),
+                                StrokeThickness = 8,
+                                Fill = Brushes.Transparent,
+                                IsHitTestVisible = false
+                            };
+
+                            // 3. Main colored path
+                            var mainPath = new Path
+                            {
+                                Name = "CableMain",
+                                Stroke = brush,
+                                StrokeThickness = 5,
+                                Fill = Brushes.Transparent,
+                                Cursor = Cursors.Hand
+                            };
+
+                            // 4. White/Light highlight path
+                            var highlightPath = new Path
+                            {
+                                Name = "CableHighlight",
+                                Stroke = new SolidColorBrush(Color.FromArgb(120, 255, 255, 255)),
+                                StrokeThickness = 1.5,
+                                Fill = Brushes.Transparent,
+                                IsHitTestVisible = false,
+                                RenderTransform = new TranslateTransform(0, -1)
                             };
 
                             var start = outVisual.TranslatePoint(new Point(outVisual.ActualWidth / 2, outVisual.ActualHeight / 2), CableLayer);
                             var end = inVisual.TranslatePoint(new Point(inVisual.ActualWidth / 2, inVisual.ActualHeight / 2), CableLayer);
 
-                            path.Data = CreateBezier(start, end);
-                            Panel.SetZIndex(path, 900);
+                            var geometry = CreateBezier(start, end, true);
+                            shadowPath.Data = geometry;
+                            borderPath.Data = geometry;
+                            mainPath.Data = geometry;
+                            highlightPath.Data = geometry;
+
+                            // Create plugs
+                            var startPlug = CreatePlugVisual(color);
+                            var endPlug = CreatePlugVisual(color);
+
+                            Canvas.SetLeft(startPlug, start.X - 12);
+                            Canvas.SetTop(startPlug, start.Y - 12);
+                            Canvas.SetLeft(endPlug, end.X - 12);
+                            Canvas.SetTop(endPlug, end.Y - 12);
+
+                            // Add to container in correct Z-order
+                            cableContainer.Children.Add(shadowPath);
+                            cableContainer.Children.Add(borderPath);
+                            cableContainer.Children.Add(mainPath);
+                            cableContainer.Children.Add(highlightPath);
+                            cableContainer.Children.Add(startPlug);
+                            cableContainer.Children.Add(endPlug);
+
+                            Panel.SetZIndex(cableContainer, 900);
 
                             Cable newCable = new Cable(outPortModel, inPortModel);
-                            newCable.Visual = path;
-                            path.Tag = Tuple.Create(outVisual, inVisual);
+                            newCable.Visual = cableContainer;
+                            
+                            var connectionTag = Tuple.Create(outVisual, inVisual);
+                            cableContainer.Tag = connectionTag;
+
                             allCables.Add(newCable);
-                            CableLayer.Children.Add(path);
+                            CableLayer.Children.Add(cableContainer);
+                            
                             newCable.AddCable(_engine);
 
-                            path.MouseLeftButtonDown += (s, args) => { RemoveCable(newCable, path); };
+                            mainPath.MouseLeftButtonDown += (s, args) => { RemoveCable(newCable, cableContainer); };
                         }
                     }
                 }
@@ -310,34 +371,70 @@ namespace vcv_etagere_remaster
         // =========================================================================
         // DRAW CABLE
         // =========================================================================
-        private PathGeometry CreateBezier(Point start, Point end)
+        private PathGeometry CreateBezier(Point start, Point end, bool endIsPort = true)
         {
-            double offset = Math.Abs(end.X - start.X) * 0.5;
-            var figure = new PathFigure { StartPoint = start };
-            var bezier = new BezierSegment
+            double r = 12.0; // Radius of the loop around the port
+
+            // Start loop points
+            Point startLoopBottom = new Point(start.X, start.Y + r);
+            Point startLoopTop = new Point(start.X, start.Y - r);
+
+            // Determine target point for the gravity curve
+            Point targetEndPoint = endIsPort ? new Point(end.X, end.Y + r) : end;
+
+            // Gravity Bezier curve between the start loop bottom and target end point
+            double dx = targetEndPoint.X - startLoopBottom.X;
+            double dy = targetEndPoint.Y - startLoopBottom.Y;
+            double distance = Math.Sqrt(dx * dx + dy * dy);
+
+            // Gravity effect (sagging downwards)
+            double horizontalFactor = Math.Clamp(Math.Abs(dx) / (distance + 0.001), 0.0, 1.0);
+            double baseSag = 40.0 + (distance * 0.35) * horizontalFactor;
+
+            double hOffset = dx * 0.25;
+
+            Point control1 = new Point(startLoopBottom.X + hOffset, startLoopBottom.Y + baseSag);
+            Point control2 = endIsPort 
+                ? new Point(targetEndPoint.X - hOffset, targetEndPoint.Y + baseSag)
+                : new Point(targetEndPoint.X, targetEndPoint.Y + baseSag * 0.5);
+
+            var figure = new PathFigure
             {
-                Point1 = new Point(start.X + offset, start.Y),
-                Point2 = new Point(end.X - offset, end.Y),
-                Point3 = end,
-                IsStroked = true
+                StartPoint = startLoopBottom,
+                IsClosed = false
             };
-            figure.Segments.Add(bezier);
+
+            // 1. Loop around the start port (clockwise complete circle)
+            figure.Segments.Add(new ArcSegment(startLoopTop, new Size(r, r), 0, false, SweepDirection.Clockwise, true));
+            figure.Segments.Add(new ArcSegment(startLoopBottom, new Size(r, r), 0, false, SweepDirection.Clockwise, true));
+
+            // 2. The main gravity Bezier curve
+            figure.Segments.Add(new BezierSegment(control1, control2, targetEndPoint, true));
+
+            if (endIsPort)
+            {
+                // 3. Loop around the end port (clockwise complete circle)
+                Point endLoopTop = new Point(end.X, end.Y - r);
+                figure.Segments.Add(new ArcSegment(endLoopTop, new Size(r, r), 0, false, SweepDirection.Clockwise, true));
+                figure.Segments.Add(new ArcSegment(targetEndPoint, new Size(r, r), 0, false, SweepDirection.Clockwise, true));
+            }
+
             return new PathGeometry(new[] { figure });
         }
         //==============================
         //DELETE CABLE
         //==============================
-        private void RemoveCable(Cable cable, Path path)
+        private void RemoveCable(Cable cable, FrameworkElement visualContainer)
         {
-            if (cable == null) return;
-            path.MouseRightButtonDown -= (s, args) => { RemoveCable(cable, path); };
-            if (cable != null)
-            {
-                cable.Destination.Value = 0;
-                CableLayer.Children.Remove(path);
-                allCables.Remove(cable);
-                cable.RemoveCable(_engine); // Unregister from audio engine
-            }
+            if (cable == null || visualContainer == null) return;
+            
+            cable.Destination.Value = 0;
+            
+            // Remove the container from the CableLayer
+            CableLayer.Children.Remove(visualContainer);
+
+            allCables.Remove(cable);
+            cable.RemoveCable(_engine); // Unregister from audio engine
         }
         //==============================
         //EXTRACT FROM VIEWMODEL TO INTERNAL
@@ -428,19 +525,45 @@ namespace vcv_etagere_remaster
             if (CableLayer == null) return;
             foreach (var child in CableLayer.Children)
             {
-                if (child is Path cablePath && cablePath.Tag is Tuple<FrameworkElement, FrameworkElement> ports)
+                if (child is Canvas cableContainer && cableContainer.Tag is Tuple<FrameworkElement, FrameworkElement> ports)
                 {
                     var outVisual = ports.Item1;
                     var inVisual = ports.Item2;
 
                     if (outVisual == null || inVisual == null) continue;
 
-                    // Recalcul des positions centrales par rapport au Canvas
+                    // Recalculate center positions relative to CableLayer
                     var start = outVisual.TranslatePoint(new Point(outVisual.ActualWidth / 2, outVisual.ActualHeight / 2), CableLayer);
                     var end = inVisual.TranslatePoint(new Point(inVisual.ActualWidth / 2, inVisual.ActualHeight / 2), CableLayer);
 
-                    // Mise à jour de la courbe
-                    cablePath.Data = CreateBezier(start, end);
+                    // Recreate Bezier geometry once
+                    var geometry = CreateBezier(start, end, true);
+                    
+                    // Apply geometry to all paths in the container
+                    foreach (var subChild in cableContainer.Children)
+                    {
+                        if (subChild is Path path)
+                        {
+                            path.Data = geometry;
+                        }
+                    }
+                    
+                    // Update plug positions
+                    if (cableContainer.Children.Count >= 6)
+                    {
+                        var startPlug = cableContainer.Children[4] as FrameworkElement;
+                        var endPlug = cableContainer.Children[5] as FrameworkElement;
+                        if (startPlug != null)
+                        {
+                            Canvas.SetLeft(startPlug, start.X - 12);
+                            Canvas.SetTop(startPlug, start.Y - 12);
+                        }
+                        if (endPlug != null)
+                        {
+                            Canvas.SetLeft(endPlug, end.X - 12);
+                            Canvas.SetTop(endPlug, end.Y - 12);
+                        }
+                    }
                 }
             }
         }
@@ -475,7 +598,6 @@ namespace vcv_etagere_remaster
 
                         foreach (var cable in cablesToRemove)
                         {
-                            // Remove the visual path of the cable
                             if (cable.Visual != null)
                             {
                                 CableLayer.Children.Remove(cable.Visual);
@@ -483,9 +605,9 @@ namespace vcv_etagere_remaster
                             else
                             {
                                 // Fallback by looking up Tag in CableLayer Children
-                                var pathToRemove = CableLayer.Children.OfType<Path>().FirstOrDefault(path => 
+                                var containersToRemove = CableLayer.Children.OfType<Canvas>().Where(container => 
                                 {
-                                    if (path.Tag is Tuple<FrameworkElement, FrameworkElement> tuple)
+                                    if (container.Tag is Tuple<FrameworkElement, FrameworkElement> tuple)
                                     {
                                         var outPortVM = tuple.Item1.DataContext as PortViewModelBase;
                                         var inPortVM = tuple.Item2.DataContext as PortViewModelBase;
@@ -493,10 +615,11 @@ namespace vcv_etagere_remaster
                                                (inPortVM != null && portsToDisconnect.Contains(inPortVM.Model));
                                     }
                                     return false;
-                                });
-                                if (pathToRemove != null)
+                                }).ToList();
+
+                                foreach (var cToRemove in containersToRemove)
                                 {
-                                    CableLayer.Children.Remove(pathToRemove);
+                                    CableLayer.Children.Remove(cToRemove);
                                 }
                             }
 
@@ -780,6 +903,190 @@ namespace vcv_etagere_remaster
                 if (found != null) return found;
             }
             return null;
+        }
+
+        // --- Premium VCV Rack-like Cable Helpers ---
+        private FrameworkElement CreatePlugVisual(Color cableColor)
+        {
+            var grid = new Grid
+            {
+                Width = 24,
+                Height = 24,
+                IsHitTestVisible = false
+            };
+
+            // 1. Shadow for the plug
+            var shadow = new Ellipse
+            {
+                Width = 24,
+                Height = 24,
+                Fill = new SolidColorBrush(Color.FromArgb(80, 0, 0, 0)),
+                Margin = new Thickness(1, 2, 0, 0)
+            };
+            grid.Children.Add(shadow);
+
+            // 2. Metallic outer ring (barrel)
+            var metalRing = new Ellipse
+            {
+                Width = 22,
+                Height = 22,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            var metalGrad = new LinearGradientBrush
+            {
+                StartPoint = new Point(0, 0),
+                EndPoint = new Point(1, 1)
+            };
+            metalGrad.GradientStops.Add(new GradientStop(Color.FromRgb(220, 220, 220), 0.0));
+            metalGrad.GradientStops.Add(new GradientStop(Color.FromRgb(160, 160, 160), 0.4));
+            metalGrad.GradientStops.Add(new GradientStop(Color.FromRgb(100, 100, 100), 1.0));
+            metalRing.Fill = metalGrad;
+            grid.Children.Add(metalRing);
+
+            // 3. Shiny colored plastic sleeve / body of the plug
+            var plugBody = new Ellipse
+            {
+                Width = 14,
+                Height = 14,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            var bodyGrad = new LinearGradientBrush
+            {
+                StartPoint = new Point(0, 0),
+                EndPoint = new Point(0, 1)
+            };
+            bodyGrad.GradientStops.Add(new GradientStop(Color.FromArgb(255, 
+                (byte)Math.Min(255, cableColor.R + 60), 
+                (byte)Math.Min(255, cableColor.G + 60), 
+                (byte)Math.Min(255, cableColor.B + 60)), 0.0));
+            bodyGrad.GradientStops.Add(new GradientStop(cableColor, 0.5));
+            bodyGrad.GradientStops.Add(new GradientStop(GetDarkerColor(cableColor), 1.0));
+            plugBody.Fill = bodyGrad;
+            grid.Children.Add(plugBody);
+
+            // 4. Center pin / rubber boot hole (dark core)
+            var centerHole = new Ellipse
+            {
+                Width = 8,
+                Height = 8,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            var holeGrad = new LinearGradientBrush
+            {
+                StartPoint = new Point(0, 0),
+                EndPoint = new Point(1, 1)
+            };
+            holeGrad.GradientStops.Add(new GradientStop(Color.FromRgb(40, 40, 40), 0.0));
+            holeGrad.GradientStops.Add(new GradientStop(Color.FromRgb(15, 15, 15), 1.0));
+            centerHole.Fill = holeGrad;
+            grid.Children.Add(centerHole);
+
+            // 5. Tiny metal jack tip/reflection inside the center hole
+            var tip = new Ellipse
+            {
+                Width = 3,
+                Height = 3,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(-2, -2, 0, 0)
+            };
+            tip.Fill = new SolidColorBrush(Color.FromArgb(180, 255, 255, 255));
+            grid.Children.Add(tip);
+
+            return grid;
+        }
+
+        private Color GetDarkerColor(Color color)
+        {
+            return Color.FromArgb(color.A, (byte)(color.R * 0.4), (byte)(color.G * 0.4), (byte)(color.B * 0.4));
+        }
+
+        // --- Performance stats updater ---
+        private int _frameCount = 0;
+        private DateTime _lastFpsUpdate = DateTime.Now;
+
+        private void UpdatePerformanceStats(object? sender, EventArgs e)
+        {
+            _frameCount++;
+            var elapsed = DateTime.Now - _lastFpsUpdate;
+            if (elapsed.TotalSeconds >= 0.5)
+            {
+                double fps = _frameCount / elapsed.TotalSeconds;
+                FpsText.Text = $"{Math.Round(fps)} FPS";
+                _frameCount = 0;
+                _lastFpsUpdate = DateTime.Now;
+            }
+
+            if (_engine != null)
+            {
+                DspText.Text = $"{_engine.DspLoad:F1} %";
+            }
+
+            if (_viewModel != null)
+            {
+                ModulesText.Text = _viewModel.Modules.Count.ToString();
+            }
+            CablesText.Text = allCables.Count.ToString();
+        }
+
+        // --- Menu Bar Event Handlers ---
+        private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void ClearPatchMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var cablesCopy = allCables.ToList();
+            foreach (var cable in cablesCopy)
+            {
+                if (cable.Visual != null)
+                {
+                    RemoveCable(cable, cable.Visual);
+                }
+            }
+            allCables.Clear();
+
+            var modulesCopy = _viewModel.Modules.ToList();
+            foreach (var module in modulesCopy)
+            {
+                _viewModel.Modules.Remove(module);
+                _engine.RemoveModule(module.Model);
+            }
+        }
+
+        private void TogglePerfMonitor_Click(object sender, RoutedEventArgs e)
+        {
+            if (PerformanceOverlay.Visibility == Visibility.Visible)
+            {
+                PerformanceOverlay.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                PerformanceOverlay.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void TogglePiano_Click(object sender, RoutedEventArgs e)
+        {
+            TogglePiano();
+        }
+
+        private void ToggleEngine_Click(object sender, RoutedEventArgs e)
+        {
+            if (_engine.IsPlaying)
+            {
+                _engine.Stop();
+                EngineStatusMenuItem.Header = "Start Engine";
+            }
+            else
+            {
+                _engine.Start();
+                EngineStatusMenuItem.Header = "Stop Engine";
+            }
         }
     }
 }

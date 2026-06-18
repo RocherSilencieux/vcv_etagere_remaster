@@ -22,3 +22,11 @@
 - [x] Pull master branch and merge it into midi branch.
 - [x] Pull presentation branch and merge it into midi branch.
 - [x] Create ExternalMidiModule to support real hardware and virtual MIDI input.
+- [x] Improve cable rendering with gravity-simulated Bezier curves.
+- [x] Make cable start and end points form a loop wrapping around the module ports.
+  - [x] Prevent loop rendering at the mouse cursor during cable dragging.
+  - [x] Fix port loops exactly to port borders and ensure the line begins and ends on the port circle edges.
+- [x] Optimize patch cable rendering performance (layered hardware-accelerated vectors, single shared PathGeometry, translate transform shadow).
+- [x] Enhance cable aesthetics with 3D metallic jack plug graphics.
+- [x] Integrate dark-themed main Menu bar (File, View, Engine) with command handlers.
+- [x] Display performance overlays in top-right corner showing active FPS, DSP load %, and module/cable counts.

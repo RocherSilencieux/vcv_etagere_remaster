@@ -156,7 +156,39 @@
     </Window.Resources>
 
     <Grid x:Name="MainGrid">
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Menu Bar -->
+        <Menu Grid.Row="0" Background="#1c1c1f" Foreground="White" BorderBrush="#111" BorderThickness="0,0,0,1">
+            <Menu.Resources>
+                <Style TargetType="MenuItem">
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="Background" Value="#1c1c1f"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="Padding" Value="10,6"/>
+                </Style>
+                <Style TargetType="Separator">
+                    <Setter Property="Background" Value="#333"/>
+                </Style>
+            </Menu.Resources>
+            <MenuItem Header="File">
+                <MenuItem Header="Clear Patch" Click="ClearPatchMenuItem_Click"/>
+                <Separator/>
+                <MenuItem Header="Exit" Click="ExitMenuItem_Click"/>
+            </MenuItem>
+            <MenuItem Header="View">
+                <MenuItem Header="Show/Hide Performance Monitor" Click="TogglePerfMonitor_Click"/>
+                <MenuItem Header="Show/Hide Keyboard Piano (Space)" Click="TogglePiano_Click"/>
+            </MenuItem>
+            <MenuItem Header="Engine">
+                <MenuItem x:Name="EngineStatusMenuItem" Header="Stop Engine" Click="ToggleEngine_Click"/>
+            </MenuItem>
+        </Menu>
+
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
                       Background="#0e0e0e">
             <!-- Canvas principal — grille pointillée + modules librement positionnés -->
             <Canvas x:Name="ModuleCanvas" Width="3000" Height="2000"
@@ -278,7 +310,7 @@
         </ScrollViewer>
 
         <!-- Piano Keyboard Overlay -->
-        <Border x:Name="PianoOverlay" VerticalAlignment="Bottom" Height="170" Background="#f2121214"
+        <Border Grid.Row="1" x:Name="PianoOverlay" VerticalAlignment="Bottom" Height="170" Background="#f2121214"
               Margin="40,0,40,20" CornerRadius="8" Visibility="Collapsed" IsHitTestVisible="True" Panel.ZIndex="100">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="15" ShadowDepth="3" Opacity="0.6"/>
@@ -377,8 +409,44 @@
             </Grid>
         </Border>
 
+        <!-- Performance Overlay Panel -->
+        <Border Grid.Row="1" x:Name="PerformanceOverlay" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,20,0"
+                Background="#cc121214" BorderBrush="#ffca80" BorderThickness="1" CornerRadius="4"
+                Padding="12,8" IsHitTestVisible="False" Panel.ZIndex="500">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.5"/>
+            </Border.Effect>
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="PERFORMANCE MONITOR" Foreground="#ffca80" FontSize="10" FontWeight="Bold" Margin="0,0,0,5" TextAlignment="Center"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="65"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="UI Framerate:" Foreground="#aaa" FontSize="11" Margin="0,2"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="FpsText" Text="60 FPS" Foreground="White" FontSize="11" FontWeight="Bold" Margin="5,2" TextAlignment="Right"/>
+                    
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="DSP Load:" Foreground="#aaa" FontSize="11" Margin="0,2"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="DspText" Text="0.0 %" Foreground="White" FontSize="11" FontWeight="Bold" Margin="5,2" TextAlignment="Right"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Modules:" Foreground="#aaa" FontSize="11" Margin="0,2"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="ModulesText" Text="0" Foreground="White" FontSize="11" FontWeight="Bold" Margin="5,2" TextAlignment="Right"/>
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Cables:" Foreground="#aaa" FontSize="11" Margin="0,2"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="CablesText" Text="0" Foreground="White" FontSize="11" FontWeight="Bold" Margin="5,2" TextAlignment="Right"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+
         <!-- Startup Splash Overlay -->
-        <Grid x:Name="SplashOverlay" Background="#ff0b0b0d" Panel.ZIndex="1000" IsHitTestVisible="True">
+        <Grid Grid.RowSpan="2" x:Name="SplashOverlay" Background="#ff0b0b0d" Panel.ZIndex="1000" IsHitTestVisible="True">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                 <TextBlock Text="VCV ÉTAGÈRE" Foreground="#ffca80" FontSize="62" FontWeight="Black" HorizontalAlignment="Center" Margin="0,0,0,5"
                            RenderTransformOrigin="0.5,0.5">
