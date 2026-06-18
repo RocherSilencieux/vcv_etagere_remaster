@@ -409,8 +409,8 @@ namespace vcv_etagere_remaster
                             
                              newCable.AddCable(_engine);
  
-                             mainPath.ToolTip = "Clic droit pour supprimer le câble";
-                             mainPath.MouseRightButtonDown += (s, args) =>
+                             mainPath.ToolTip = "Clic pour supprimer le câble";
+                             mainPath.MouseLeftButtonDown += (s, args) =>
                              {
                                  RemoveCable(newCable, cableContainer);
                                  args.Handled = true;
