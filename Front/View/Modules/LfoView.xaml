@@ -30,14 +30,7 @@
                 <ComboBox ItemsSource="{Binding AvailableWaveforms}"
                           SelectedItem="{Binding SelectedWaveform}"
                           DisplayMemberPath="Name"
-                          Background="#141921" Foreground="Black" BorderBrush="#4f5d73"
-                          FontSize="10" HorizontalContentAlignment="Stretch" Margin="0,0,0,12">
-                    <ComboBox.ItemContainerStyle>
-                        <Style TargetType="ComboBoxItem">
-                            <Setter Property="Foreground" Value="Black"/>
-                        </Style>
-                    </ComboBox.ItemContainerStyle>
-                </ComboBox>
+                          FontSize="10" HorizontalContentAlignment="Stretch" Margin="0,0,0,12"/>
 
                 <TextBlock Text="FREQUENCY (HZ)" Foreground="LightGray" FontSize="9" HorizontalAlignment="Center"/>
                 <Slider Minimum="0.01" Maximum="50.0" Value="{Binding Frequency}" Orientation="Horizontal" Margin="0,2,0,12"/>

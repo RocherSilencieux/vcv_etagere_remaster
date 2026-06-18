@@ -30,13 +30,7 @@
                 <ComboBox ItemsSource="{Binding AvailableDevices}" 
                           SelectedItem="{Binding SelectedDevice}"
                           DisplayMemberPath="Name"
-                          Width="90" Height="22" FontSize="9">
-                    <ComboBox.ItemContainerStyle>
-                        <Style TargetType="ComboBoxItem">
-                            <Setter Property="Foreground" Value="Black"/>
-                        </Style>
-                    </ComboBox.ItemContainerStyle>
-                </ComboBox>
+                          Width="90" Height="22" FontSize="9"/>
             </StackPanel>
 
             <!-- Output Ports -->

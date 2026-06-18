@@ -30,14 +30,7 @@
                 <ComboBox ItemsSource="{Binding AvailableModes}"
                           SelectedItem="{Binding SelectedMode}"
                           DisplayMemberPath="Name"
-                          Background="#1a1a1a" Foreground="Black" BorderBrush="#444"
-                          FontSize="10" HorizontalContentAlignment="Stretch" Margin="0,0,0,12">
-                    <ComboBox.ItemContainerStyle>
-                        <Style TargetType="ComboBoxItem">
-                            <Setter Property="Foreground" Value="Black"/>
-                        </Style>
-                    </ComboBox.ItemContainerStyle>
-                </ComboBox>
+                          FontSize="10" HorizontalContentAlignment="Stretch" Margin="0,0,0,12"/>
 
                 <TextBlock Text="CUTOFF (HZ)" Foreground="Gray" FontSize="9" HorizontalAlignment="Center"/>
                 <Slider Minimum="20" Maximum="20000" Value="{Binding BaseCutoff}" Orientation="Horizontal" Margin="0,2,0,12"/>

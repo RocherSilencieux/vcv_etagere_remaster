@@ -19,6 +19,9 @@
 - [ ] Implement robust Drag-and-Drop functionality for cables.
 - [ ] Add more complex modules (VCA, ADSR, Filter).
 - [ ] Refine the visual design of `VcoView.xaml` with custom controls (knobs, styled jacks).
+- [x] Implement a 2-channel Mixer module to merge 2 different audio inputs.
+- [x] Clarify emoji rule in .cursorrules and add mixer menu emoji.
+- [x] Redesign dropdowns (ComboBoxes) and context menus with custom sober flat dark theme.
 - [x] Pull master branch and merge it into midi branch.
 - [x] Pull presentation branch and merge it into midi branch.
 - [x] Create ExternalMidiModule to support real hardware and virtual MIDI input.

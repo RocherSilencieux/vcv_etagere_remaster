@@ -54,14 +54,7 @@
                 <ComboBox ItemsSource="{Binding AvailableDevices}"
                           SelectedItem="{Binding SelectedDevice}"
                           DisplayMemberPath="Name"
-                          Background="#1a1a1a" Foreground="Black" BorderBrush="#444"
-                          FontSize="10" HorizontalContentAlignment="Stretch">
-                    <ComboBox.ItemContainerStyle>
-                        <Style TargetType="ComboBoxItem">
-                            <Setter Property="Foreground" Value="Black"/>
-                        </Style>
-                    </ComboBox.ItemContainerStyle>
-                </ComboBox>
+                          FontSize="10" HorizontalContentAlignment="Stretch"/>
             </StackPanel>
         </Grid>
 

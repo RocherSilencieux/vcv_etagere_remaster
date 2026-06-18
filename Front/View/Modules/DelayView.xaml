@@ -32,14 +32,7 @@
                 <ComboBox ItemsSource="{Binding AvailablePresets}"
                           SelectedItem="{Binding SelectedPreset}"
                           DisplayMemberPath="Name"
-                          Background="#1a1a1a" Foreground="Black" BorderBrush="#444"
-                          FontSize="10" HorizontalContentAlignment="Stretch" Margin="0,0,0,8">
-                    <ComboBox.ItemContainerStyle>
-                        <Style TargetType="ComboBoxItem">
-                            <Setter Property="Foreground" Value="Black"/>
-                        </Style>
-                    </ComboBox.ItemContainerStyle>
-                </ComboBox>
+                          FontSize="10" HorizontalContentAlignment="Stretch" Margin="0,0,0,8"/>
 
                 <TextBlock Text="TIME (MS)" Foreground="Gray" FontSize="9" HorizontalAlignment="Center"/>
                 <Slider Minimum="10.0" Maximum="2000.0" Value="{Binding DelayTimeMs}" Orientation="Horizontal" Margin="0,2,0,8"/>

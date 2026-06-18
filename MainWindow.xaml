@@ -43,6 +43,9 @@
         <DataTemplate DataType="{x:Type viewmodels:ExternalMidiViewModel}">
             <views:ExternalMidiView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:MixerViewModel}">
+            <views:MixerView />
+        </DataTemplate>
 
         <!-- Piano Key Styles -->
         <Style x:Key="WhiteKeyStyle" TargetType="Button">
@@ -162,18 +165,7 @@
         </Grid.RowDefinitions>
 
         <!-- Menu Bar -->
-        <Menu Grid.Row="0" Background="#1c1c1f" Foreground="White" BorderBrush="#111" BorderThickness="0,0,0,1">
-            <Menu.Resources>
-                <Style TargetType="MenuItem">
-                    <Setter Property="Foreground" Value="White"/>
-                    <Setter Property="Background" Value="#1c1c1f"/>
-                    <Setter Property="BorderThickness" Value="0"/>
-                    <Setter Property="Padding" Value="10,6"/>
-                </Style>
-                <Style TargetType="Separator">
-                    <Setter Property="Background" Value="#333"/>
-                </Style>
-            </Menu.Resources>
+        <Menu Grid.Row="0">
             <MenuItem Header="File">
                 <MenuItem Header="Clear Patch" Click="ClearPatchMenuItem_Click"/>
                 <Separator/>
@@ -258,6 +250,9 @@
                                   Foreground="White" Background="#1e1e1e"/>
                         <MenuItem Header="🔌  EXT MIDI — Entrée externe"
                                   Tag="ExternalMidi" Click="AddModuleMenuItem_Click"
+                                  Foreground="White" Background="#1e1e1e"/>
+                        <MenuItem Header="🎚️  Mixer — 2-Channel Mixer"
+                                  Tag="Mixer" Click="AddModuleMenuItem_Click"
                                   Foreground="White" Background="#1e1e1e"/>
                     </ContextMenu>
                 </Canvas.ContextMenu>

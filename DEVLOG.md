@@ -85,3 +85,13 @@
 - Integrated command click handlers: File (Clear Patch, Exit), View (Toggle Perf Monitor, Toggle Piano), and Engine (Toggle Audio Status).
 - Configured Performance Monitor overlay in the top-right corner inside the canvas region, tracking FPS, DSP Load %, module count, and active cable count.
 - Verified build compiles cleanly with 0 warnings and 0 errors.
+- Created MixerModule class to mix 2 audio input signals with independent level, constant-power panning, and smooth mute transitions using LinearRamp smoothers.
+- Created MixerViewModel wrapping the MixerModule properties and exposing visual ports.
+- Designed MixerView.xaml with sliders for levels and panning, custom styled mute buttons, and input/output jack connectors.
+- Integrated the Mixer module case inside MainViewModel and registered the DataTemplate and context menu item in MainWindow.xaml.
+- Clarified rule 1 in .cursorrules to state that the emoji restriction only applies to chat responses.
+- Added a slider emoji to the Mixer menu item in MainWindow.xaml.
+- Created custom global flat dark theme in Front/Themes/DarkTheme.xaml styling ComboBox, ComboBoxItem, Menu, ContextMenu, MenuItem, and Separator.
+- Merged the new stylesheet in App.xaml to apply it application-wide.
+- Cleaned up inline styles and ItemContainerStyle overrides in all module views (Vco, Vcf, Lfo, Delay, ExternalMidi, AudioOutput) to inherit the clean dark theme.
+- Simplified MainWindow.xaml by removing local Menu resources.

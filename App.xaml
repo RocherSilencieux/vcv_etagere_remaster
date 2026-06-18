@@ -6,5 +6,10 @@
              xmlns:ViewModele="clr-namespace:vcv_etagere_remaster.Front.ViewModel.Base">
               
     <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Front/Themes/DarkTheme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

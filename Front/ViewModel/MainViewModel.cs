@@ -139,6 +139,12 @@ namespace vcv_etagere_remaster.Front.ViewModel
                     _engine.AddModule(extMidi);
                     vm = new ExternalMidiViewModel(extMidi) { GridX = x, GridY = y };
                     break;
+
+                case "Mixer":
+                    var mixer = new MixerModule();
+                    _engine.AddModule(mixer);
+                    vm = new MixerViewModel(mixer) { GridX = x, GridY = y };
+                    break;
             }
 
             if (vm != null)
