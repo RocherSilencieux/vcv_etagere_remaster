@@ -1,6 +1,6 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:vmbase="clr-namespace:vcv_etagere_remaster.Front.ViewModel.Base">
+                    xmlns:vmbase="clr-namespace:vcv_etagere_remaster.Front.ViewModel.Base;assembly=vcv_etagere_remaster">
 
     <!-- Clean Dark ComboBox ToggleButton Template -->
     <ControlTemplate x:Key="ComboBoxToggleButtonTemplate" TargetType="ToggleButton">
