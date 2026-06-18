@@ -156,6 +156,12 @@
             <DoubleAnimation Storyboard.TargetProperty="Opacity" Storyboard.TargetName="SplashOverlay"
                              From="1" To="1" Duration="0:0:2.0"/>
         </Storyboard>
+        <LinearGradientBrush x:Key="RailBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#888888" Offset="0.0"/>
+            <GradientStop Color="#cccccc" Offset="0.3"/>
+            <GradientStop Color="#aaaaaa" Offset="0.6"/>
+            <GradientStop Color="#555555" Offset="1.0"/>
+        </LinearGradientBrush>
     </Window.Resources>
 
     <Grid x:Name="MainGrid">
@@ -229,6 +235,29 @@
                         <MenuItem Header="🎚️  Mixer — 2-Channel Mixer" Tag="Mixer" Click="AddModuleMenuItem_Click"/>
                     </ContextMenu>
                 </Canvas.ContextMenu>
+
+                <!-- Rack Rails Background Layer -->
+                <Canvas x:Name="RackBackground" Width="3000" Height="2000" IsHitTestVisible="False">
+                    <!-- Row 1 -->
+                    <Border Canvas.Top="20" Width="3000" Height="400" Background="#141416"/>
+                    <Rectangle Canvas.Top="20" Width="3000" Height="6" Fill="{StaticResource RailBrush}"/>
+                    <Rectangle Canvas.Top="414" Width="3000" Height="6" Fill="{StaticResource RailBrush}"/>
+
+                    <!-- Row 2 -->
+                    <Border Canvas.Top="460" Width="3000" Height="400" Background="#141416"/>
+                    <Rectangle Canvas.Top="460" Width="3000" Height="6" Fill="{StaticResource RailBrush}"/>
+                    <Rectangle Canvas.Top="854" Width="3000" Height="6" Fill="{StaticResource RailBrush}"/>
+
+                    <!-- Row 3 -->
+                    <Border Canvas.Top="900" Width="3000" Height="400" Background="#141416"/>
+                    <Rectangle Canvas.Top="900" Width="3000" Height="6" Fill="{StaticResource RailBrush}"/>
+                    <Rectangle Canvas.Top="1294" Width="3000" Height="6" Fill="{StaticResource RailBrush}"/>
+
+                    <!-- Row 4 -->
+                    <Border Canvas.Top="1340" Width="3000" Height="400" Background="#141416"/>
+                    <Rectangle Canvas.Top="1340" Width="3000" Height="6" Fill="{StaticResource RailBrush}"/>
+                    <Rectangle Canvas.Top="1734" Width="3000" Height="6" Fill="{StaticResource RailBrush}"/>
+                </Canvas>
 
                 <!-- ItemsControl des modules — panel Canvas, positions liées à GridX/GridY -->
                 <ItemsControl x:Name="ModulesControl" ItemsSource="{Binding Modules}" HorizontalAlignment="Left" VerticalAlignment="Top">

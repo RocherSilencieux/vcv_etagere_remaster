@@ -126,3 +126,10 @@
 - Separated the cable rendering geometry into `CreateBezierCurveOnly` (the hanging body) and `CreateLoopsOnly` (the decorative port loops).
 - Instantiated separate Path elements for the port loops (`LoopsShadow`, `LoopsBorder`, `LoopsMain`, `LoopsHighlight`) inside `OnPortMouseUp` and set `IsHitTestVisible = false` on them.
 - Updated `UpdateCablesPosition` to correctly assign geometries by name and retrieve plug visuals dynamically from the end of the children array, preserving visual draping behavior while ensuring that clicking on cabled ports initiates a new connection drag.
+
+## 2026-06-18 (Eurorack Rails & Module Snapping)
+- Declared a metallic linear gradient `RailBrush` resource in `MainWindow.xaml`.
+- Added the `RackBackground` Canvas element containing 4 horizontal module slot rows (height 400, spaced at 40px gaps) with silver mounting rails.
+- Declared a constant array `RowTops` representing the top coordinates of the rows (`20`, `460`, `900`, `1340`).
+- Updated `Canvas_PreviewMouseLeftButtonUp` to snap the dropped module's `GridY` coordinate to the nearest coordinate in `RowTops`.
+- Updated `AddModuleMenuItem_Click` to snap the spawned module's Y position to the nearest rail coordinate in `RowTops` on right-click creation.

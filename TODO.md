@@ -1,5 +1,8 @@
 # TODO
 
+- [x] Implement a Eurorack horizontal rail system with snapping.
+  - [x] Define visual rack rails in MainWindow.xaml.
+  - [x] Implement snapping logic in MainWindow.xaml.cs.
 - [x] Restore cable deletion trigger to Left-Click (but resolved port drag issues by making port loops non-hit-testable, preventing accidental deletions when dragging multiple cables from the same port).
   - [x] Map deletion to left-click in MainWindow.xaml.cs.
   - [x] Split cable geometry to separate decorative port loops from the hit-testable main curve.

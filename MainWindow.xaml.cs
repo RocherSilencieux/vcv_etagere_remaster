@@ -25,6 +25,7 @@ namespace vcv_etagere_remaster
         private List<Cable> allCables = new List<Cable>();
         private bool isDraggingCable = false;
         private const double GridSize = 20.0;
+        private static readonly double[] RowTops = new[] { 20.0, 460.0, 900.0, 1340.0 };
         private static readonly string[] CableColors = new[]
         {
             "#00f5ff", // Neon Cyan
@@ -149,8 +150,21 @@ namespace vcv_etagere_remaster
             if (sender is MenuItem mi && mi.Tag is string moduleType)
             {
                 double snappedX = Math.Round(_rightClickPosition.X / GridSize) * GridSize;
-                double snappedY = Math.Round(_rightClickPosition.Y / GridSize) * GridSize;
-                _viewModel.AddModule(moduleType, snappedX, snappedY);
+                
+                // Snap Y to the nearest Eurorack rail row
+                double nearestY = RowTops[0];
+                double minDiff = double.MaxValue;
+                foreach (double rowTop in RowTops)
+                {
+                    double diff = Math.Abs(_rightClickPosition.Y - rowTop);
+                    if (diff < minDiff)
+                    {
+                        minDiff = diff;
+                        nearestY = rowTop;
+                    }
+                }
+
+                _viewModel.AddModule(moduleType, snappedX, nearestY);
             }
         }
 
@@ -587,7 +601,20 @@ namespace vcv_etagere_remaster
 
             // Snap à la grille au relâchement
             _draggedModule.GridX = Math.Round(_draggedModule.GridX / GridSize) * GridSize;
-            _draggedModule.GridY = Math.Round(_draggedModule.GridY / GridSize) * GridSize;
+
+            // Snap Y to the nearest Eurorack rail row
+            double nearestY = RowTops[0];
+            double minDiff = double.MaxValue;
+            foreach (double rowTop in RowTops)
+            {
+                double diff = Math.Abs(_draggedModule.GridY - rowTop);
+                if (diff < minDiff)
+                {
+                    minDiff = diff;
+                    nearestY = rowTop;
+                }
+            }
+            _draggedModule.GridY = nearestY;
 
             UpdateCablesPosition();
             FinishDrag();
