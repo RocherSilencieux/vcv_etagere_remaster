@@ -1,5 +1,6 @@
 # TODO
 
+- [x] Merge all mixer branch changes into master and create tweaks branch.
 - [x] Disable vertical scrollbars in ContextMenu and MenuItem templates in DarkTheme.xaml.
 - [x] Verify and ensure the "Ajouter un module" and "＋" menu item and separator are removed in MainWindow.xaml.
 - [x] Clean directories and launch the project using dotnet run.

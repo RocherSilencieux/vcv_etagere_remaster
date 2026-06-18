@@ -110,3 +110,7 @@
 - Removed the disabled header item "Ajouter un module" and the plus sign "＋" from `MainWindow.xaml` to clean up the right-click context menu.
 - Removed the corresponding horizontal separator from `MainWindow.xaml` ContextMenu.
 - Set `VerticalScrollBarVisibility="Disabled"` and `HorizontalScrollBarVisibility="Disabled"` on the `ContextMenu` and `MenuItem` submenu popup `ScrollViewer` templates in `Front/Themes/DarkTheme.xaml` to completely eliminate right-side scrollbars.
+
+## 2026-06-18 (Branch Merge and Tweaks Branch)
+- Merged the `mixer` branch containing the 2-Channel Mixer module implementation and UI adjustments into the `master` branch.
+- Created and switched to a new development branch named `tweaks`.
