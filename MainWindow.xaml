@@ -215,8 +215,6 @@
                 <!-- Menu contextuel clic droit : ajouter un module -->
                 <Canvas.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="＋  Ajouter un module" IsEnabled="False" FontWeight="Bold"/>
-                        <Separator/>
                         <MenuItem Header="🎵  VCO — Oscillateur" Tag="VCO" Click="AddModuleMenuItem_Click"/>
                         <MenuItem Header="🔁  Delay" Tag="Delay" Click="AddModuleMenuItem_Click"/>
                         <MenuItem Header="🌊  Reverb" Tag="Reverb" Click="AddModuleMenuItem_Click"/>

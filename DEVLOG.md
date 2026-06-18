@@ -105,3 +105,8 @@
 - Replaced the default `ContextMenu` control template in `DarkTheme.xaml` with a clean custom template containing only a dark `Border` and `ScrollViewer`, completely eliminating the default WPF vertical separator line/gutter.
 - Refactored `MenuItem` template columns and added a trigger on `Icon` being null to collapse the icon column space when no icon is set, aligning all menu item text flush to the left.
 - Terminated lingering debugger sessions and locks, performed a total cleanup of `obj` and `bin` cache directories, and executed a clean compile/launch of the GUI application.
+
+## 2026-06-18 (Context Menu UI Clean-up)
+- Removed the disabled header item "Ajouter un module" and the plus sign "＋" from `MainWindow.xaml` to clean up the right-click context menu.
+- Removed the corresponding horizontal separator from `MainWindow.xaml` ContextMenu.
+- Set `VerticalScrollBarVisibility="Disabled"` and `HorizontalScrollBarVisibility="Disabled"` on the `ContextMenu` and `MenuItem` submenu popup `ScrollViewer` templates in `Front/Themes/DarkTheme.xaml` to completely eliminate right-side scrollbars.

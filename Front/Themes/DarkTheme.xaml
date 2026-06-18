@@ -143,7 +143,9 @@
                             BorderThickness="{TemplateBinding BorderThickness}" 
                             CornerRadius="3"
                             SnapsToDevicePixels="true">
-                        <ScrollViewer CanContentScroll="true" Margin="0,2">
+                        <ScrollViewer CanContentScroll="true" Margin="0,2"
+                                      VerticalScrollBarVisibility="Disabled"
+                                      HorizontalScrollBarVisibility="Disabled">
                             <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"/>
                         </ScrollViewer>
                     </Border>
@@ -168,31 +170,22 @@
                             SnapsToDevicePixels="true">
                         <Grid VerticalAlignment="Center">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="MenuItemGestureColumnGroup"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             
-                            <!-- Icon Column -->
-                            <ContentPresenter x:Name="Icon" 
-                                               ContentSource="Icon" 
-                                               HorizontalAlignment="Center" 
-                                               VerticalAlignment="Center" 
-                                               Width="16" Height="16" 
-                                               Margin="5,0"/>
-                            
                             <!-- Header Column -->
                             <ContentPresenter x:Name="contentPresenter" 
-                                              Grid.Column="1" 
-                                              ContentSource="Header" 
-                                              RecognizesAccessKey="true" 
-                                              VerticalAlignment="Center"
-                                              Margin="10,2,15,2"/>
+                                               Grid.Column="0" 
+                                               ContentSource="Header" 
+                                               RecognizesAccessKey="true" 
+                                               VerticalAlignment="Center"
+                                               Margin="10,2,15,2"/>
                             
                             <!-- Gesture Column -->
                             <TextBlock x:Name="InputGestureText" 
-                                       Grid.Column="2" 
+                                       Grid.Column="1" 
                                        Text="{TemplateBinding InputGestureText}" 
                                        Foreground="#888" 
                                        VerticalAlignment="Center" 
@@ -200,7 +193,7 @@
                             
                             <!-- Submenu Indicator -->
                             <Path x:Name="RightArrow" 
-                                  Grid.Column="3" 
+                                  Grid.Column="2" 
                                   Data="M 0 0 L 4 4 L 0 8 Z" 
                                   Fill="#888" 
                                   VerticalAlignment="Center" 
@@ -220,7 +213,9 @@
                                         BorderThickness="1" 
                                         CornerRadius="3"
                                         Padding="0,2">
-                                    <ScrollViewer x:Name="SubmenuScrollViewer" CanContentScroll="true">
+                                    <ScrollViewer x:Name="SubmenuScrollViewer" CanContentScroll="true"
+                                                  VerticalScrollBarVisibility="Disabled"
+                                                  HorizontalScrollBarVisibility="Disabled">
                                         <ItemsPresenter x:Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Cycle"/>
                                     </ScrollViewer>
                                 </Border>
@@ -249,9 +244,7 @@
                         <Trigger Property="Role" Value="SubmenuItem">
                             <Setter TargetName="RightArrow" Property="Visibility" Value="Collapsed"/>
                         </Trigger>
-                        <Trigger Property="Icon" Value="{x:Null}">
-                            <Setter TargetName="Icon" Property="Visibility" Value="Collapsed"/>
-                        </Trigger>
+
                         <Trigger Property="IsEnabled" Value="false">
                             <Setter Property="Foreground" Value="#555555"/>
                         </Trigger>
