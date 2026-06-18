@@ -102,3 +102,5 @@
 - Wrapped `MidiIn` queries in `ExternalMidiModule.cs` inside defensive `try-catch` blocks to prevent crash failures when running on target environments without sound/MIDI cards or broken audio drivers.
 - Ran a clean rebuild after clearing `obj` and `bin` cache directories, verifying compilation successfully completes with 0 errors and 0 warnings.
 - Cleaned up inline `Foreground` and `Background` property overrides from the canvas `ContextMenu` and its child `MenuItem` elements in `MainWindow.xaml` so that they correctly inherit the modern flat style definitions from the global `DarkTheme.xaml`.
+- Replaced the default `ContextMenu` control template in `DarkTheme.xaml` with a clean custom template containing only a dark `Border` and `ScrollViewer`, completely eliminating the default WPF vertical separator line/gutter.
+- Refactored `MenuItem` template columns and added a trigger on `Icon` being null to collapse the icon column space when no icon is set, aligning all menu item text flush to the left.

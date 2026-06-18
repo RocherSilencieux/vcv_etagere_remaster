@@ -135,7 +135,21 @@
         <Setter Property="BorderBrush" Value="#444"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="0,2"/>
-        <Setter Property="Grid.IsSharedSizeScope" Value="true"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <Border Background="{TemplateBinding Background}" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="{TemplateBinding BorderThickness}" 
+                            CornerRadius="3"
+                            SnapsToDevicePixels="true">
+                        <ScrollViewer CanContentScroll="true" Margin="0,2">
+                            <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!-- Clean Dark MenuItem Template -->
@@ -154,7 +168,7 @@
                             SnapsToDevicePixels="true">
                         <Grid VerticalAlignment="Center">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="MenuItemIconColumnGroup"/>
+                                <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="MenuItemGestureColumnGroup"/>
                                 <ColumnDefinition Width="Auto"/>
@@ -162,11 +176,11 @@
                             
                             <!-- Icon Column -->
                             <ContentPresenter x:Name="Icon" 
-                                              ContentSource="Icon" 
-                                              HorizontalAlignment="Center" 
-                                              VerticalAlignment="Center" 
-                                              Width="16" Height="16" 
-                                              Margin="5,0"/>
+                                               ContentSource="Icon" 
+                                               HorizontalAlignment="Center" 
+                                               VerticalAlignment="Center" 
+                                               Width="16" Height="16" 
+                                               Margin="5,0"/>
                             
                             <!-- Header Column -->
                             <ContentPresenter x:Name="contentPresenter" 
@@ -234,6 +248,9 @@
                         </Trigger>
                         <Trigger Property="Role" Value="SubmenuItem">
                             <Setter TargetName="RightArrow" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="Icon" Value="{x:Null}">
+                            <Setter TargetName="Icon" Property="Visibility" Value="Collapsed"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="false">
                             <Setter Property="Foreground" Value="#555555"/>

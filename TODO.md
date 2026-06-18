@@ -1,5 +1,6 @@
 # TODO
 
+- [x] Recreate ContextMenu template from scratch and remove vertical gutter bar and icon gap.
 - [x] Clean up inline styles from Canvas ContextMenu in MainWindow.xaml to apply global DarkTheme correctly.
 - [x] Investigate and resolve launching error reported by the user (prevent constructor-level exceptions in Engine and ExternalMidiModule).
 
