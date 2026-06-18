@@ -104,3 +104,4 @@
 - Cleaned up inline `Foreground` and `Background` property overrides from the canvas `ContextMenu` and its child `MenuItem` elements in `MainWindow.xaml` so that they correctly inherit the modern flat style definitions from the global `DarkTheme.xaml`.
 - Replaced the default `ContextMenu` control template in `DarkTheme.xaml` with a clean custom template containing only a dark `Border` and `ScrollViewer`, completely eliminating the default WPF vertical separator line/gutter.
 - Refactored `MenuItem` template columns and added a trigger on `Icon` being null to collapse the icon column space when no icon is set, aligning all menu item text flush to the left.
+- Terminated lingering debugger sessions and locks, performed a total cleanup of `obj` and `bin` cache directories, and executed a clean compile/launch of the GUI application.
